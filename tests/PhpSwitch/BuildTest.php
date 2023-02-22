@@ -2,7 +2,7 @@
 
 namespace PhpSwitch\Tests;
 
-use PhpBrew\Build;
+use PhpSwitch\Build;
 use PHPUnit\Framework\TestCase;
 
 /**

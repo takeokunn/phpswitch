@@ -1,10 +1,10 @@
 <?php
 
-namespace PhpBrew\Patches;
+namespace PhpSwitch\Patches;
 
 use CLIFramework\Logger;
-use PhpBrew\Build;
-use PhpBrew\Testing\PatchTestCase;
+use PhpSwitch\Build;
+use PhpSwitch\Testing\PatchTestCase;
 
 class FreeTypePatchTest extends PatchTestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpBrew;
+namespace PhpSwitch;
 
 use Exception;
 use Symfony\Component\Yaml\Yaml;
@@ -132,7 +132,7 @@ class Config
     }
 
     /**
-     * XXX: This method should be migrated to PhpBrew\Build class.
+     * XXX: This method should be migrated to PhpSwitch\Build class.
      *
      * @param string $buildName
      *
@@ -168,7 +168,7 @@ class Config
     }
 
     /**
-     * XXX: This method should be migrated to PhpBrew\Build class.
+     * XXX: This method should be migrated to PhpSwitch\Build class.
      */
     public static function getCurrentPhpConfigScanPath($home = false)
     {

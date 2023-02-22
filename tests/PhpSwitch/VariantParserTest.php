@@ -172,7 +172,7 @@ class VariantParserTest extends TestCase
      */
     public function testInvalidSyntax(array $args, $expectedMessage)
     {
-        $this->expectException('PhpBrew\\InvalidVariantSyntaxException');
+        $this->expectException('PhpSwitch\\InvalidVariantSyntaxException');
         $this->expectExceptionMessage($expectedMessage);
 
         $this->parse($args);

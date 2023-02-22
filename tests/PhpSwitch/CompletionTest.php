@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpBrew\Tests;
+namespace PhpSwitch\Tests;
 
-use PhpBrew\Testing\CommandTestCase;
+use PhpSwitch\Testing\CommandTestCase;
 
 class CompletionTest extends CommandTestCase
 {
@@ -12,10 +12,10 @@ class CompletionTest extends CommandTestCase
     public function testCompletion($shell)
     {
         $this->expectOutputString(
-            file_get_contents(__DIR__ . '/../../completion/' . $shell . '/_phpbrew')
+            file_get_contents(__DIR__ . '/../../completion/' . $shell . '/_phpswitch')
         );
 
-        $this->app->run(array('phpbrew', $shell, '--bind', 'phpbrew', '--program', 'phpbrew'));
+        $this->app->run(array('phpswitch', $shell, '--bind', 'phpswitch', '--program', 'phpswitch'));
     }
 
     public static function completionProvider()
