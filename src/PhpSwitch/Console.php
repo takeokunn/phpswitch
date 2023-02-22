@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSwitchi;
+namespace PhpSwitch;
 
 use BadMethodCallException;
 use CLIFramework\Application;

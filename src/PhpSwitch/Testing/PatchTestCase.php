@@ -2,11 +2,11 @@
 
 namespace PhpSwitch\Testing;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-abstract class PatchTestCase extends PHPUnit_Framework_TestCase
+abstract class PatchTestCase extends TestCase
 {
     protected function setupBuildDirectory($version)
     {

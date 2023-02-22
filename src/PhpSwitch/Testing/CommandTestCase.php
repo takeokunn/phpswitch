@@ -5,6 +5,7 @@ namespace PhpSwitch\Testing;
 use CLIFramework\Testing\CommandTestCase as BaseCommandTestCase;
 use GetOptionKit\Option;
 use PhpSwitch\Console;
+use PhpSwitch\Testing\VCRAdapter;
 
 abstract class CommandTestCase extends BaseCommandTestCase
 {
@@ -31,7 +32,7 @@ abstract class CommandTestCase extends BaseCommandTestCase
         return $this->primaryVersion;
     }
 
-    public function setupApplication()
+    public static function setupApplication()
     {
         $console = Console::getInstance();
         $console->getLogger()->setQuiet();
