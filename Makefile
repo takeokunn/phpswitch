@@ -1,4 +1,4 @@
-TARGET        = phpbrew
+TARGET        = phpswitch
 SIGNATURE     = $(TARGET).asc
 CP            = cp
 INSTALL_PATH  = /usr/local/bin
@@ -22,8 +22,8 @@ install: $(TARGET)
 	$(CP) $(TARGET) $(INSTALL_PATH)
 
 update/completion:
-	bin/phpbrew zsh --bind phpbrew --program phpbrew > completion/zsh/_phpbrew
-	bin/phpbrew bash --bind phpbrew --program phpbrew > completion/bash/_phpbrew
+	bin/phpswitch zsh --bind phpswitch --program phpswitch > completion/zsh/_phpswitch
+	bin/phpswitch bash --bind phpswitch --program phpswitch > completion/bash/_phpswitch
 
 test:
 	$(TEST)

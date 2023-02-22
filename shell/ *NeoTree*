@@ -1,0 +1,23 @@
+	 phpswitch
+		  .git
+		  .github
+  		  workflows
+  			  ISSUE_TEMPLATE.md
+  			  dependabot.yml
+		  bin
+		  completion
+		  screenshots
+		  shell
+		  src
+		  tests
+			  .editorconfig
+			  .gitattributes
+			  .gitignore
+			  CHANGES.md
+			  CONTRIBUTING.md
+			  LICENSE
+			  Makefile
+			  README.md
+			  composer.json
+			  phpcs.xml.dist
+			  phpunit.xml.dist
