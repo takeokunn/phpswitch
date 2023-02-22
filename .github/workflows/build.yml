@@ -25,8 +25,5 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v2
 
-      - name: Update PHPUnit
-        run: composer update phpunit/phpunit --with-dependencies
-
       - name: Run test suite
         run: vendor/bin/phpunit --exclude-group mayignore --coverage-clover build/logs/clover.xml
