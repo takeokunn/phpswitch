@@ -1,22 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
-class VariantParser
+final class VariantParser
 {
     /**
-     * @param string[] $args
+     * @param list<string> $args
      *
-     * @return array
+     * @return array{
+     *     enabled_variants: list<array{string, string|null}>,
+     *     disabled_variants: list<string>,
+     *     extra_options: list<string>
+     * }
      *
      * @throws InvalidVariantSyntaxException
      */
-    public static function parseCommandArguments(array $args)
+    public static function parseCommandArguments(array $args): array
     {
         $target = [];
-        $extra = [];
-        $enabledVariants = [];
-        $disabledVariants = [];
+        $enabled_variants = [];
+        $disabled_variants = [];
+        $extra_options = [];
 
         while (true) {
             $arg = array_shift($args);
@@ -30,51 +36,63 @@ class VariantParser
             }
 
             if ($arg === '--') {
-                $extra = $args;
+                $extra_options = $args;
                 break;
             }
 
             $operator = substr($arg, 0, 1);
 
-            match ($operator) {
-                '+' => $target =& $enabledVariants,
-                '-' => $target =& $disabledVariants,
-                default => throw new InvalidVariantSyntaxException('Variant must start with a + or -'),
-            };
-
-            $variant            = substr($arg, 1);
+            $variant = substr($arg, 1);
             [$name, $value] = array_pad(explode('=', $variant, 2), 2, null);
 
             if ($name === '') {
                 throw new InvalidVariantSyntaxException('Variant name cannot be empty');
             }
 
+            match ($operator) {
+                '+' => $enabled_variants[$name] = $value,
+                '-' => $disabled_variants[] = $name,
+                default => throw new InvalidVariantSyntaxException('Variant must start with a + or -'),
+            };
+
             $target[$name] = $value;
         }
 
-        return ['enabled_variants' => $enabledVariants, 'disabled_variants' => $disabledVariants, 'extra_options' => $extra];
+        return [
+            'enabled_variants' => $enabled_variants,
+            'disabled_variants' => $disabled_variants,
+            'extra_options' => $extra_options
+        ];
     }
 
     /**
      * Reveal the variants info to command arguments.
+     *
+     * @param array{
+     *     enabled_variants: list<array{string, string|null}>,
+     *     disabled_variants: list<string>,
+     *     extra_options: list<string>
+     * } $info
+     *
+     * @return string
      */
-    public static function revealCommandArguments(array $info)
+    public static function revealCommandArguments(array $info): string
     {
         $args = [];
 
-        foreach ($info['enabled_variants'] as $k => $v) {
-            $arg = '+' . $k;
-
-            if (!is_bool($v)) {
-                $arg .= '=' . $v;
+        if (count($info['enabled_variants']) > 0) {
+            foreach ($info['enabled_variants'] as $key => $value) {
+                $arg = '+' . $key;
+                if (is_string($value)) {
+                    $arg .= '=' . $value;
+                }
+                $args[] = $arg;
             }
-
-            $args[] = $arg;
         }
 
-        if (!empty($info['disabled_variants'])) {
-            foreach ($info['disabled_variants'] as $k => $_) {
-                $args[] = '-' . $k;
+        if (count($info['disabled_variants']) > 0) {
+            foreach ($info['disabled_variants'] as $value) {
+                $args[] = '-' . $value;
             }
         }
 
