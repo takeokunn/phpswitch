@@ -1,0 +1,26 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to an undefined method PhpSwitch\\\\Command\\\\ExtensionCommand\\\\ConfigCommand\\:\\:error\\(\\)\\.$#"
+			count: 1
+			path: src/PhpSwitch/Command/ExtensionCommand/ConfigCommand.php
+
+		-
+			message: "#^Instantiated class PhpSwitch\\\\Command\\\\ExtensionCommand\\\\ExtensionDownloader not found\\.$#"
+			count: 1
+			path: src/PhpSwitch/Command/ExtensionCommand/ShowCommand.php
+
+		-
+			message: "#^Instantiated class PhpSwitch\\\\Command\\\\ExtensionCommand\\\\ExtensionList not found\\.$#"
+			count: 1
+			path: src/PhpSwitch/Command/ExtensionCommand/ShowCommand.php
+
+		-
+			message: "#^Access to an undefined property PhpSwitch\\\\PatchKit\\\\RegExpPatchRule\\:\\:\\$predicator\\.$#"
+			count: 5
+			path: src/PhpSwitch/PatchKit/RegExpPatchRule.php
+
+		-
+			message: "#^Instantiated class PhpSwitch\\\\Patches\\\\IntlWith64bitPatch not found\\.$#"
+			count: 1
+			path: src/PhpSwitch/Tasks/AfterConfigureTask.php

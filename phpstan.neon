@@ -1,0 +1,17 @@
+includes:
+    - ./phpstan-baseline.neon
+
+parameters:
+  paths:
+    - src
+  level: 0
+  excludePaths:
+    - rector.php
+    - bin/
+    - completion/
+    - screenshots/
+    - shell/
+    - vendor/
+    - tests/
+  parallel:
+    maximumNumberOfProcesses: 8
