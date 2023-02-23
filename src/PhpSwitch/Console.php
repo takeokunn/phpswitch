@@ -2,13 +2,12 @@
 
 namespace PhpSwitch;
 
-use BadMethodCallException;
-use CLIFramework\Application;
-use CLIFramework\Exception\CommandArgumentNotEnoughException;
-use CLIFramework\Exception\CommandNotFoundException;
-use CLIFramework\ExceptionPrinter\DevelopmentExceptionPrinter;
-use CLIFramework\ExceptionPrinter\ProductionExceptionPrinter;
 use Exception;
+use BadMethodCallException;
+use GetOptionKit\OptionCollection;
+use CLIFramework\Application;
+use CLIFramework\Exception\{ CommandArgumentNotEnoughException, CommandNotFoundException };
+use CLIFramework\ExceptionPrinter\{ DevelopmentExceptionPrinter, ProductionExceptionPrinter };
 use PhpSwitch\Exception\SystemCommandException;
 
 class Console extends Application
@@ -16,13 +15,16 @@ class Console extends Application
     const NAME = 'phpswitch';
     const VERSION = '2.0.0';
 
-    public function options($opts)
+    /**
+     * @param OptionCollection $opts
+     */
+    public function options($opts): void
     {
         parent::options($opts);
         $opts->add('no-progress', 'Do not display progress bar.');
     }
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -75,7 +77,7 @@ class Console extends Application
         }
     }
 
-    public function configure()
+    public function configure(): void
     {
         // avoid warnings when web scraping possible malformed HTML from pecl
         if (extension_loaded('libxml')) {
@@ -88,27 +90,28 @@ class Console extends Application
         date_default_timezone_set(Utils::readTimeZone() ?: 'America/Los_Angeles');
 
         // fix bold output so it looks good on light and dark terminals
-        $this->getFormatter()->addStyle('bold', array('bold' => 1));
+        $this->getFormatter()->addStyle('bold', ['bold' => 1]);
 
         $this->logger->levelStyles['warn'] = 'yellow';
         $this->logger->levelStyles['error'] = 'red';
     }
 
-    public function brief()
+    public function brief(): string
     {
         return 'brew your latest php!';
     }
 
-    public function runWithTry(array $argv)
+    /**
+     * @param array<mixed> $argv
+     */
+    public function runWithTry(array $argv): bool
     {
         try {
             return $this->run($argv);
         } catch (CommandArgumentNotEnoughException $e) {
             $this->logger->error($e->getMessage());
             $this->logger->writeln('Expected argument prototypes:');
-            foreach ($e->getCommand()->getAllCommandPrototype() as $p) {
-                $this->logger->writeln("\t" . $p);
-            }
+            $this->logger->writeln("\t" . $e->getCommand()->getAllCommandPrototype());
             $this->logger->newline();
         } catch (CommandNotFoundException $e) {
             $this->logger->error(
