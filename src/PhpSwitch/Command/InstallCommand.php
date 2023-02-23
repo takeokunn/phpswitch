@@ -299,7 +299,7 @@ class InstallCommand extends Command
 
         // assume +default variant if no build config is given
         if (!$variantInfo['enabled_variants']) {
-            $build->settings->enableVariant('default');
+            $build->settings->setEnableVariant('default');
             $this->logger->notice(
                 "You haven't enabled any variants. The default variant will be enabled: "
             );

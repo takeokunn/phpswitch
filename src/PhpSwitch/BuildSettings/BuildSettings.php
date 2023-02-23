@@ -11,35 +11,35 @@ final class BuildSettings
     /**
      * @var list<string>
      */
-    private array $enabledVariants = [];
+    private array $enabled_variants = [];
 
     /**
      * @var list<string>
      * */
-    private array $disabledVariants = [];
+    private array $disabled_variants = [];
 
     /**
      * @var list<string>
      */
-    private array $extraOptions = [];
+    private array $extra_options = [];
 
     /**
      * @param array{
-     *     enabled_variants: list<string>|null,
-     *     disabled_variants: list<string>|null,
-     *     extra_options: list<string>|null
+     *     enabled_variants?: list<string>,
+     *     disabled_variants?: list<string>,
+     *     extra_options?: list<string>
      * }|array{} $settings
      */
     public function __construct(array $settings = [])
     {
         if (isset($settings['enabled_variants'])) {
-            $this->enableVariants($settings['enabled_variants']);
+            $this->setEnableVariants($settings['enabled_variants']);
         }
         if (isset($settings['disabled_variants'])) {
-            $this->disableVariants($settings['disabled_variants']);
+            $this->setDisableVariants($settings['disabled_variants']);
         }
         if (isset($settings['extra_options'])) {
-            $this->extraOptions = [...$this->extraOptions, ...$settings['extra_options']];
+            $this->extra_options = [...$this->extra_options, ...$settings['extra_options']];
         }
     }
 
@@ -53,130 +53,166 @@ final class BuildSettings
     public function toArray(): array
     {
         return [
-            'enabled_variants' => $this->enabledVariants,
-            'disabled_variants' => $this->disabledVariants,
-            'extra_options' => $this->extraOptions,
+            'enabled_variants' => $this->enabled_variants,
+            'disabled_variants' => $this->disabled_variants,
+            'extra_options' => $this->extra_options,
         ];
     }
 
-    public function enableVariants(array $settings): void
-    {
-        foreach ($settings as $name => $value) {
-            $this->enableVariant($name, $value);
-        }
-    }
+    ///////////////////////////////////////////////////////////////////////////
+    //                             getter/setter                             //
+    ///////////////////////////////////////////////////////////////////////////
 
-    public function enableVariant($name, $value = null)
-    {
-        $this->enabledVariants[$name] = $value;
-    }
+    // for enabled_variant
 
-    public function disableVariants(array $settings)
+    /**
+     * @return list<string>
+     */
+    public function getEnabledVariants(): array
     {
-        foreach ($settings as $name => $value) {
-            $this->disableVariant($name);
-        }
+        return $this->enabled_variants;
     }
 
     /**
-     * Disable variant.
-     *
-     * @param string $name The variant name.
+     * @param list<string> $settings
      */
-    public function disableVariant($name)
+    public function setEnableVariants(array $settings): void
     {
-        $this->disabledVariants[$name] = null;
+        foreach ($settings as $name) {
+            $this->setEnableVariant($name);
+        }
+    }
+
+    public function setEnableVariant(string $name): void
+    {
+        $this->enabled_variants = array_unique([...$this->enabled_variants, $name]);
+    }
+
+    public function isEnabledVariant(string $name): bool
+    {
+        return in_array($name, $this->enabled_variants, true);
+    }
+
+    // for disabled_variant
+
+    /**
+     * @return list<string>
+     */
+    public function getDisabledVariants(): array
+    {
+        return $this->disabled_variants;
     }
 
     /**
-     * Remove the enabled the variants since we've disabled
-     * them.
+     * @param list<string> $settings
      */
-    public function resolveVariants()
+    public function setDisableVariants(array $settings): void
     {
-        foreach ($this->disabledVariants as $name => $_) {
+        foreach ($settings as $name) {
+            $this->setDisableVariant($name);
+        }
+    }
+
+    public function setDisableVariant(string $name): void
+    {
+        $this->disabled_variants = array_unique([...$this->disabled_variants, $name]);
+    }
+
+    public function isDisabledVariant(string $name): bool
+    {
+        return in_array($name, $this->disabled_variants, true);
+    }
+
+    // for extra_options
+
+    /**
+     * @return list<string>
+     */
+    public function getExtraOptions(): array
+    {
+        return $this->extra_options;
+    }
+
+    /**
+     * @param list<string> $settings
+     */
+    public function setExtraOptions(array $settings): void
+    {
+        foreach ($settings as $name) {
+            $this->setExtraOption($name);
+        }
+    }
+
+    public function setExtraOption(string $name): void
+    {
+        $this->extra_options = array_unique([...$this->extra_options, $name]);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                                utility                                //
+    ///////////////////////////////////////////////////////////////////////////
+    public function resolveVariants(): void
+    {
+        foreach ($this->disabled_variants as $name) {
             $this->removeVariant($name);
         }
     }
 
-    public function isEnabledVariant($name)
+    private function removeVariant(string $name): void
     {
-        return array_key_exists($name, $this->enabledVariants);
+        $this->enabled_variants = array_filter($this->enabled_variants, fn ($value) => $value !== $name);
     }
 
-    public function isDisabledVariant($name)
-    {
-        return array_key_exists($name, $this->disabledVariants);
-    }
-
-    /**
-     * Remove enabled variant.
-     */
-    public function removeVariant($name): void
-    {
-        unset($this->enabledVariants[$name]);
-    }
-
-    /**
-     * Get enabled variants.
-     */
-    public function getEnabledVariants()
-    {
-        return $this->enabledVariants;
-    }
-
-    /**
-     * Get all disabled variants.
-     */
-    public function getDisabledVariants()
-    {
-        return $this->disabledVariants;
-    }
-
-    public function getExtraOptions()
-    {
-        return $this->extraOptions;
-    }
-
-    /**
-     * Load and return the variant info from file.
-     */
-    public function loadVariantInfoFile($variantFile)
+    public function loadVariantInfoFile(string $variantFile): void
     {
         if (!is_readable($variantFile)) {
-            throw new Exception(
-                "Can't load variant info! Variants file {$variantFile} is not readable."
-            );
+            throw new Exception("Can't load variant info! Variants file {$variantFile} is not readable.");
         }
-        $variantInfo = unserialize(file_get_contents($variantFile));
 
-        $this->loadVariantInfo($variantInfo);
+        $file = file_get_contents($variantFile);
+        if (!$file) {
+            throw new Exception("Can't load variant info! Variants file {$variantFile} is not exist.");
+        }
+
+        /**
+         * @var array{
+         *     enabled_variants?: list<string>,
+         *     disabled_variants?: list<string>,
+         *     extra_options?: list<string>,
+         * } $variant_info
+         */
+        $variant_info = unserialize($file);
+        $this->loadVariantInfo($variant_info);
     }
 
-    public function writeVariantInfoFile($variantInfoFile)
+    /**
+     * @return int|false
+     */
+    public function writeVariantInfoFile(string $variant_info_file): int|bool
     {
-        return file_put_contents($variantInfoFile, serialize(['enabled_variants' => $this->enabledVariants, 'disabled_variants' => $this->disabledVariants, 'extra_options' => array_unique($this->extraOptions)]));
+        $options = ['enabled_variants' => $this->enabled_variants, 'disabled_variants' => $this->disabled_variants, 'extra_options' => array_unique($this->extra_options)];
+        return file_put_contents($variant_info_file, serialize($options));
     }
 
-    public function loadVariantInfo(array $variantInfo)
+    /**
+     * @param array{
+     *     enabled_variants?: list<string>,
+     *     disabled_variants?: list<string>,
+     *     extra_options?: list<string>,
+     * } $variant_info
+     */
+    public function loadVariantInfo(array $variant_info): void
     {
-        if (isset($variantInfo['enabled_variants'])) {
-            foreach ($variantInfo['enabled_variants'] as $variant => $value) {
-                if ($value === true) {
-                    // TRUE no longer indicates the absence of a prefix, NULL does
-                    $this->enableVariant($variant);
-                } else {
-                    $this->enableVariant($variant, $value);
-                }
-            }
+        if (isset($variant_info['enabled_variants'])) {
+            $this->setEnableVariants($variant_info['enabled_variants']);
         }
 
-        if (isset($variantInfo['disabled_variants'])) {
-            $this->disableVariants($variantInfo['disabled_variants']);
+        if (isset($variant_info['disabled_variants'])) {
+            $this->setDisableVariants($variant_info['disabled_variants']);
         }
 
-        if (isset($variantInfo['extra_options'])) {
-            $this->extraOptions = array_unique(array_merge($this->extraOptions, $variantInfo['extra_options']));
+        if (isset($variant_info['extra_options'])) {
+            $this->extra_options = array_unique(array_merge($this->extra_options, $variant_info['extra_options']));
         }
 
         $this->resolveVariants();
