@@ -4,6 +4,7 @@ includes:
 parameters:
   paths:
     - src
+    - tests
   level: 0
   excludePaths:
     - rector.php
@@ -12,6 +13,5 @@ parameters:
     - screenshots/
     - shell/
     - vendor/
-    - tests/
   parallel:
     maximumNumberOfProcesses: 8

@@ -21,6 +21,6 @@ parameters:
 			path: src/PhpSwitch/PatchKit/RegExpPatchRule.php
 
 		-
-			message: "#^Instantiated class PhpSwitch\\\\Patches\\\\IntlWith64bitPatch not found\\.$#"
+			message: "#^Class PhpSwitch\\\\Extension\\\\Provider\\\\PeclProvider constructor invoked with 0 parameters, 2 required\\.$#"
 			count: 1
-			path: src/PhpSwitch/Tasks/AfterConfigureTask.php
+			path: tests/PhpSwitch/Extension/ExtensionInstallerTest.php
