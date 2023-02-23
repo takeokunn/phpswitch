@@ -1,51 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 use CLIFramework\Logger;
-use PhpSwitch\Exception\SystemCommandException;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use PhpSwitch\Buildable;
+use PhpSwitch\Exception\SystemCommandException;
 
-class Utils
+final class Utils
 {
+    /**
+     * @return string|false
+     */
     public static function readTimeZone()
     {
-        if (is_readable($tz = '/etc/timezone')) {
-            $lines = array_filter(file($tz), fn($line) => !preg_match('/^#/', (string) $line));
-            if (!empty($lines)) {
-                return trim((string) $lines[0]);
-            }
+        $tz_file = '/etc/timezone';
+        if (!is_readable($tz_file)) {
+            return false;
         }
 
-        return false;
+        $tz = file($tz_file);
+        if (!$tz) {
+            return false;
+        }
+
+        $lines = array_filter($tz, fn ($line) => !preg_match('/^#/', (string) $line));
+        if (count($lines) === 0) {
+            return false;
+        }
+
+        return trim((string) $lines[0]);
     }
 
-    public static function support64bit()
+    /**
+     * Detect support 64bit.
+     */
+    public static function support64bit(): bool
     {
         $int = '9223372036854775807';
         $int = intval($int);
-        if ($int == 9_223_372_036_854_775_807) {
-            /* 64bit */
 
-            return true;
-        } elseif ($int == 2_147_483_647) {
-            /* 32bit */
-
-            return false;
-        } else {
+        /* Not support 64bit */
+        if ($int !== 9_223_372_036_854_775_807) {
             return false;
         }
+
+        return true;
     }
 
     /**
      * Find bin from prefix list.
-     *
-     * @param string $bin
-     *
-     * @return string|null
      */
-    public static function findBinByPrefix($bin)
+    public static function findBinByPrefix(string $bin): ?string
     {
         $prefixes = self::getLookupPrefixes();
 
@@ -63,69 +72,10 @@ class Utils
             }
         }
 
-        return;
+        return null;
     }
 
-    public static function detectArch($prefix)
-    {
-        /*
-            Prioritizes the FHS compliant
-            /usr/lib/i386-linux-gnu/
-            /usr/include/i386-linux-gnu/
-            /usr/lib/x86_64-linux-gnu/
-            /usr/local/lib/powerpc-linux-gnu/
-            /usr/local/include/powerpc-linux-gnu/
-            /opt/foo/lib/sparc-solaris/
-            /opt/bar/include/sparc-solaris/
-         */
-        $multiArchs = [
-            'lib/lib64',
-            'lib/lib32',
-            'lib64',
-            // Linux Fedora
-            'lib',
-            // CentOS
-            'lib/ia64-linux-gnu',
-            // Linux IA-64
-            'lib/x86_64-linux-gnu',
-            // Linux x86_64
-            'lib/x86_64-kfreebsd-gnu',
-            // FreeBSD
-            'lib/i386-linux-gnu',
-        ];
-
-        return array_filter($multiArchs, fn($archName) => file_exists($prefix . '/' . $archName));
-    }
-
-    public static function getLookupPrefixes()
-    {
-        $prefixes = [
-            '/usr',
-            '/usr/local',
-            '/usr/local/opt',
-            // homebrew link
-            '/opt',
-            '/opt/local',
-        ];
-
-        if ($pathStr = getenv('PHPSWITCH_LOOKUP_PREFIX')) {
-            $paths = explode(':', $pathStr);
-            foreach ($paths as $path) {
-                $prefixes[] = $path;
-            }
-        }
-
-        // append detected lib paths to the end
-        foreach ($prefixes as $prefix) {
-            foreach (self::detectArch($prefix) as $arch) {
-                $prefixes[] = "$prefix/$arch";
-            }
-        }
-
-        return array_reverse($prefixes);
-    }
-
-    public static function findLibPrefix()
+    public static function findLibPrefix(): ?string
     {
         $files = func_get_args();
         $prefixes = self::getLookupPrefixes();
@@ -142,7 +92,7 @@ class Utils
         return null;
     }
 
-    public static function findIncludePrefix()
+    public static function findIncludePrefix(): ?string
     {
         $files = func_get_args();
         $prefixes = self::getLookupPrefixes();
@@ -156,15 +106,10 @@ class Utils
             }
         }
 
-        return;
+        return null;
     }
 
-    /**
-     * @param string $package
-     *
-     * @return string|null
-     */
-    public static function getPkgConfigPrefix($package)
+    public static function getPkgConfigPrefix(string $package): ?string
     {
         if (!self::findBin('pkg-config')) {
             return null;
@@ -176,6 +121,10 @@ class Utils
             return null;
         }
 
+        if (!$path) {
+            return null;
+        }
+
         if (!file_exists($path)) {
             return null;
         }
@@ -183,31 +132,31 @@ class Utils
         return $path;
     }
 
-    public static function system($command, $logger = null, $build = null)
+    /**
+     * @param list<string>|string $command
+     */
+    public static function system($command, Logger $logger = null, Buildable $build = null): int
     {
         if (is_array($command)) {
             $command = implode(' ', $command);
         }
 
-        if ($logger) {
+        if (isset($logger)) {
             $logger->debug('Running Command:' . $command);
         }
 
-        $lastline = system($command, $returnValue);
-        if ($returnValue !== 0) {
+        $lastline = system($command, $return_value);
+        if ($return_value !== 0) {
             throw new SystemCommandException("Command failed: $command returns: $lastline", $build);
         }
-        return $returnValue;
+
+        return $return_value;
     }
 
     /**
      * Find executable binary by PATH environment.
-     *
-     * @param string $bin binary name
-     *
-     * @return string|null The path or NULL if the path does not exist
      */
-    public static function findBin($bin)
+    public static function findBin(string $bin): ?string
     {
         $path = getenv('PATH');
         $paths = explode(PATH_SEPARATOR, $path);
@@ -227,15 +176,13 @@ class Utils
     /**
      * Finds prefix using the given finders.
      *
-     * @param  PrefixFinder[] $prefixFinders
-     * @return string|null
+     * @param  list<PrefixFinder> $prefixFinders
      */
-    public static function findPrefix(array $prefixFinders)
+    public static function findPrefix(array $prefixFinders): ?string
     {
         foreach ($prefixFinders as $prefixFinder) {
             $prefix = $prefixFinder->findPrefix();
-
-            if ($prefix !== null) {
+            if (isset($prefix)) {
                 return $prefix;
             }
         }
@@ -243,10 +190,11 @@ class Utils
         return null;
     }
 
-    public static function recursive_unlink($path, Logger $logger)
+    public static function recursive_unlink(string $path, Logger $logger): void
     {
-        $directoryIterator = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
-        $it = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::CHILD_FIRST);
+        $directory_iterator = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
+        $it = new RecursiveIteratorIterator($directory_iterator, RecursiveIteratorIterator::CHILD_FIRST);
+
         foreach ($it as $file) {
             $logger->debug('Deleting ' . $file->getPathname());
             if ($file->isDir()) {
@@ -255,19 +203,91 @@ class Utils
                 unlink($file->getPathname());
             }
         }
+
         if (is_dir($path)) {
             rmdir($path);
-        } elseif (is_file($path)) {
+        }
+
+        if (is_file($path)) {
             unlink($path);
         }
     }
 
-    public static function editor($file)
+    public static function editor(string $file): int
     {
         $tty = exec('tty');
         $editor = escapeshellarg(getenv('EDITOR') ?: 'nano');
         exec("{$editor} {$file} > {$tty}", $_, $ret);
 
         return $ret;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                            private utility                            //
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return list<string>
+     */
+    private static function detectArchitecture(string $prefix): array
+    {
+        /**
+         * Prioritizes the FHS compliant
+         * /usr/lib/i386-linux-gnu/
+         * /usr/include/i386-linux-gnu/
+         * /usr/lib/x86_64-linux-gnu/
+         * /usr/local/lib/powerpc-linux-gnu/
+         * /usr/local/include/powerpc-linux-gnu/
+         * /opt/foo/lib/sparc-solaris/
+         * /opt/bar/include/sparc-solaris/
+         */
+        $multi_archs = [
+            'lib/lib64',
+            'lib/lib32',
+            'lib64',
+            // Linux Fedora
+            'lib',
+            // CentOS
+            'lib/ia64-linux-gnu',
+            // Linux IA-64
+            'lib/x86_64-linux-gnu',
+            // Linux x86_64
+            'lib/x86_64-kfreebsd-gnu',
+            // FreeBSD
+            'lib/i386-linux-gnu',
+        ];
+
+        return array_filter($multi_archs, fn($arch_name) => file_exists($prefix . '/' . $arch_name));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function getLookupPrefixes(): array
+    {
+        $prefixes = [
+            '/usr',
+            '/usr/local',
+            '/usr/local/opt',
+            // homebrew link
+            '/opt',
+            '/opt/local',
+        ];
+
+        if ($pathStr = getenv('PHPSWITCH_LOOKUP_PREFIX')) {
+            $paths = explode(':', $pathStr);
+            foreach ($paths as $path) {
+                $prefixes = [...$prefixes, $path];
+            }
+        }
+
+        // append detected lib paths to the end
+        foreach ($prefixes as $prefix) {
+            foreach (self::detectArchitecture($prefix) as $arch) {
+                $prefixes = [...$prefixes, "$prefix/$arch"];
+            }
+        }
+
+        return array_reverse($prefixes);
     }
 }
