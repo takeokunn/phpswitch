@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 use Exception;
 
-class VersionDslParser
+final class VersionDslParser
 {
-    protected static $schemes = ['git@github.com:', 'github.com:', 'github.com/', 'github:'];
+    /**
+     * @var list<string> $schemes
+     */
+    protected static array $schemes = ['git@github.com:', 'github.com:', 'github.com/', 'github:'];
 
-    public function parse($dsl)
+    /**
+     * @return array<mixed>|bool
+     */
+    public function parse(string $dsl): array|bool
     {
         if (preg_match('/^(php-)?(\d+\.\d+\.\d+(alpha|beta|RC)\d+)$/', (string) $dsl, $matches)) {
             $version = 'php-' . $matches[2];
-
             return ['version' => $version, 'url' => $this->buildGitHubUrl('php', $version), 'is_tag' => true];
         }
 
@@ -55,10 +62,8 @@ class VersionDslParser
      *
      * @param string $owner Repository owner
      * @param string $ref Git commit reference
-     *
-     * @return string
      */
-    private function buildGitHubUrl($owner, $ref)
+    private function buildGitHubUrl(string $owner, string $ref): string
     {
         return sprintf(
             'https://github.com/%s/php-src/archive/%s.tar.gz',

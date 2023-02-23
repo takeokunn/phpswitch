@@ -20,6 +20,7 @@
             <directory>tests/PhpSwitch/Distribution</directory>
             <file>tests/PhpSwitch/UtilsTest.php</file>
             <file>tests/PhpSwitch/ConfigTest.php</file>
+            <file>tests/PhpSwitch/VersionDslParser.php</file>
         </testsuite>
     </testsuites>
     <filter>

@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests;
 
-use PhpSwitch\VersionDslParser;
 use PHPUnit\Framework\TestCase;
+use PhpSwitch\VersionDslParser;
 
 /**
  * VersionDslParserTest
@@ -15,14 +17,17 @@ class VersionDslParserTest extends TestCase
     /**
      * @var VersionDslParser
      */
-    protected $parser;
+    protected VersionDslParser $parser;
 
     protected function setUp(): void
     {
         $this->parser = new VersionDslParser();
     }
 
-    public static function dslProvider()
+    /**
+     * @return list<list<string>>
+     */
+    public static function dslProvider(): array
     {
         return [
             // official
@@ -68,10 +73,9 @@ class VersionDslParserTest extends TestCase
     /**
      * @dataProvider dslProvider
      */
-    public function testGithubDsl($dsl, $url, $version)
+    public function testGithubDsl(string $dsl, string $url, string $version): void
     {
         $info = $this->parser->parse($dsl);
-
         $this->assertSame($version, $info['version']);
         $this->assertSame($url, $info['url']);
     }
