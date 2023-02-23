@@ -22,7 +22,7 @@ final class BuildTest extends TestCase
     public function testNeutralVirtualVariant()
     {
         $build = new Build('5.5.0');
-        $build->enableVariant('neutral');
+        $build->setEnableVariant('neutral', null);
         $build->resolveVariants();
 
         $this->assertTrue($build->isEnabledVariant('neutral'));
