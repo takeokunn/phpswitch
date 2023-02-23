@@ -1,4 +1,5 @@
 /vendor
 .phpswitch
 .phpcs.cache
+.phpunit.result.cache
 /build
