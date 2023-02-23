@@ -20,7 +20,7 @@ final class BrewPrefixFinder implements PrefixFinder
     /**
      * {@inheritDoc}
      */
-    public function findPrefix()
+    public function findPrefix(): ?string
     {
         $brew = Utils::findBin('brew');
 

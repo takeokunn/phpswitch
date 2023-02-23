@@ -20,7 +20,7 @@ final class LibPrefixFinder implements PrefixFinder
     /**
      * {@inheritDoc}
      */
-    public function findPrefix()
+    public function findPrefix(): ?string
     {
         return Utils::findLibPrefix($this->path);
     }
