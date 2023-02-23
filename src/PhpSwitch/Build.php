@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 use PhpSwitch\BuildSettings\BuildSettings;
@@ -8,18 +10,8 @@ use PhpSwitch\BuildSettings\BuildSettings;
  * A build object contains version information,
  * variant configuration,
  * paths and an build identifier (BuildId).
- *
- * @method array getEnabledVariants()
- * @method array getDisabledVariants()
- * @method bool isEnabledVariant(string $variant)
- * @method bool isDisabledVariant(string $variant)
- * @method array getExtraOptions()
- * @method enableVariant(string $variant, string $value = null)
- * @method disableVariant(string $variant)
- * @method removeVariant(string $variant)
- * @method array resolveVariants()
  */
-class Build implements Buildable
+final class Build implements Buildable
 {
     /**
      * States that describe finished task.
@@ -31,81 +23,65 @@ class Build implements Buildable
     final const STATE_BUILD = 4;
     final const STATE_INSTALL = 5;
 
-    public $name;
-
-    public $version;
+    private readonly string $name;
+    private readonly string $version;
 
     /**
      * @var string The source directory
      */
-    public $sourceDirectory;
+    private string $sourceDirectory;
 
     /**
      * @var string the directory that contains bin/php, var/..., includes/
      */
-    public $installPrefix;
-
-    /**
-     * @var BuildSettings
-     */
-    public $settings;
+    public ?string $installPrefix = null;
+    public BuildSettings $settings;
 
     /**
      * Build state.
-     *
-     * @var string
      */
-    public $state;
-
-    /**
-     * environment related information (should be moved to environment class).
-     */
-    public $osName;
-
-    public $osRelease;
+    private int $state;
 
     /**
      * Construct a Build object,.
      *
      * A build object contains the information of all build options, prefix, paths... etc
      *
-     * @param string $version       build version
-     * @param string $name          build name
-     * @param string $installPrefix install prefix
+     * @param string      $version       build version
+     * @param string|null $name          build name
+     * @param string|null $installPrefix install prefix
      */
-    public function __construct($version, $name = null, $installPrefix = null)
+    public function __construct(string $version, ?string $name = null, ?string $installPrefix = null)
     {
         if (str_starts_with($version, 'php-')) {
             $version = substr($version, 4);
         }
 
-        if ($name === null) {
+        if (is_null($name)) {
             $name = 'php-' . $version;
         }
 
         $this->version = $version;
-        $this->name    = $name;
+        $this->name = $name;
 
         if ($installPrefix) {
             $this->setInstallPrefix($installPrefix);
         }
 
         $this->setBuildSettings(new BuildSettings());
-        $this->osName = php_uname('s');
-        $this->osRelease = php_uname('r');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
 
-    public function compareVersion($version)
+    public function compareVersion(string $version): int
     {
         return version_compare($this->version, $version);
     }
@@ -113,7 +89,7 @@ class Build implements Buildable
     /**
      * PHP Source directory, this method returns value only when source directory is set.
      */
-    public function setSourceDirectory($dir)
+    public function setSourceDirectory(string $dir): void
     {
         $this->sourceDirectory = $dir;
     }
@@ -134,21 +110,20 @@ class Build implements Buildable
 
     public function getBuildLogPath(): string
     {
-        $dir = $this->getSourceDirectory() . DIRECTORY_SEPARATOR . 'build.log';
-        return $dir;
+        return $this->getSourceDirectory() . DIRECTORY_SEPARATOR . 'build.log';
     }
 
-    public function setInstallPrefix($prefix)
+    public function setInstallPrefix(string $prefix): void
     {
         $this->installPrefix = $prefix;
     }
 
-    public function getBinDirectory()
+    public function getBinDirectory(): string
     {
         return $this->installPrefix . DIRECTORY_SEPARATOR . 'bin';
     }
 
-    public function getEtcDirectory()
+    public function getEtcDirectory(): string
     {
         $etc = $this->installPrefix . DIRECTORY_SEPARATOR . 'etc';
         if (!file_exists($etc)) {
@@ -158,22 +133,18 @@ class Build implements Buildable
         return $etc;
     }
 
-    public function getInstallPrefix()
+    public function getInstallPrefix(): ?string
     {
         return $this->installPrefix;
     }
 
-    public function getPath($subpath)
-    {
-        return $this->installPrefix . DIRECTORY_SEPARATOR . $subpath;
-    }
-
-    public function setBuildSettings(BuildSettings $buildSettings)
+    private function setBuildSettings(BuildSettings $buildSettings): void
     {
         $this->settings = $buildSettings;
-        if (!$this->getInstallPrefix()) {
+        if (is_null($this->installPrefix)) {
             return;
         }
+
         // TODO: in future, we only stores build meta information, and that
         // also contains the variant info,
         // but for backward compatibility, we still need a method to handle
@@ -188,20 +159,16 @@ class Build implements Buildable
      * Find a installed build by name,
      * currently a $name is a php version, but in future we may have customized
      * name for users.
-     *
-     * @param string $name
-     *
-     * @return Build
      */
-    public static function findByName($name)
+    public static function findByName(string $name): ?Build
     {
         $prefix = Config::getVersionInstallPrefix($name);
-        if (file_exists($prefix)) {
-            // a installation exists
-            return new self($name, null, $prefix);
+        if (!file_exists($prefix)) {
+            return null;
         }
 
-        return;
+        // a installation exists
+        return new self($name, null, $prefix);
     }
 
     /**
@@ -216,30 +183,28 @@ class Build implements Buildable
      *
      * Not used yet.
      */
-    public function getStateFile()
+    public function getStateFile(): ?string
     {
-        if ($dir = $this->getInstallPrefix()) {
-            return $dir . DIRECTORY_SEPARATOR . 'phpswitch_status';
-        }
+        return $this->getInstallPrefix() . DIRECTORY_SEPARATOR . 'phpswitch_status';
     }
 
-    public function setState($state)
+    public function setState(int $state): void
     {
         $this->state = $state;
-        if ($path = $this->getStateFile()) {
-            file_put_contents($path, $state);
-        }
+        $stateFile = $this->getStateFile();
+        file_put_contents($stateFile, $state);
     }
 
-    public function getState()
+    public function getState(): int
     {
         if ($this->state) {
             return $this->state;
         }
-        if ($path = $this->getStateFile()) {
-            if (file_exists($path)) {
-                return $this->state = intval(file_get_contents($path)) || self::STATE_NONE;
-            }
+
+        $path = $this->getStateFilne();
+        if (file_exists($path)) {
+            $this->state = intval(file_get_contents($path)) || self::STATE_NONE;
+            return $this->state;
         }
 
         return self::STATE_NONE;

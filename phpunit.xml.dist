@@ -18,11 +18,12 @@
         <testsuite name="PHPSwitch">
             <directory>tests/PhpSwitch/BuildSettings</directory>
             <directory>tests/PhpSwitch/Distribution</directory>
-            <file>tests/PhpSwitch/UtilsTest.php</file>
+            <file>tests/PhpSwitch/BuildTest.php</file>
             <file>tests/PhpSwitch/ConfigTest.php</file>
-            <file>tests/PhpSwitch/VersionDslParser.php</file>
-            <file>tests/PhpSwitch/VariantParserTest.php</file>
             <file>tests/PhpSwitch/PrefixFinder/ExecutablePrefixFinderTest.php</file>
+            <file>tests/PhpSwitch/VariantParserTest.php</file>
+            <file>tests/PhpSwitch/VersionDslParser.php</file>
+            <file>tests/PhpSwitch/UtilsTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
