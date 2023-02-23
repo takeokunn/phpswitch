@@ -25,8 +25,8 @@ class ExtensionDownloader
     {
         $url = $provider->buildPackageDownloadUrl($version);
         $basename = $provider->resolveDownloadFileName($version);
-        $distDir = Config::getDistFileDir();
-        $targetFilePath = $distDir . DIRECTORY_SEPARATOR . $basename;
+        $distFileDir = Config::getDistFileDir();
+        $targetFilePath = $distFileDir . DIRECTORY_SEPARATOR . $basename;
         DownloadFactory::getInstance($this->logger, $this->options)->download($url, $targetFilePath);
 
         $currentPhpExtensionDirectory = Config::getBuildDir() . '/' . Config::getCurrentPhpName() . '/ext';

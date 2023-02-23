@@ -16,7 +16,6 @@ final class Config
     /**
      * Return optional home directory.
      *
-     * @return string
      *
      * @throws Exception
      */

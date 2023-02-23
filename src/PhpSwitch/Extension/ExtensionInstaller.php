@@ -22,17 +22,17 @@ class ExtensionInstaller
 
     public function install(Extension $extension, array $configureOptions = [])
     {
-        $path = $extension->getSourceDirectory();
+        $sourceDirectory = $extension->getSourceDirectory();
         $pwd = getcwd();
-        $buildLogPath = $path . DIRECTORY_SEPARATOR . 'build.log';
+        $buildLogPath = $sourceDirectory . DIRECTORY_SEPARATOR . 'build.log';
         $make = new MakeTask($this->logger, $this->options);
 
         $make->setBuildLogPath($buildLogPath);
 
         $this->logger->info("Log stored at: $buildLogPath");
 
-        $this->logger->info("Changing directory to $path");
-        chdir($path);
+        $this->logger->info("Changing directory to $sourceDirectory");
+        chdir($sourceDirectory);
 
         if (!$this->options->{'no-clean'} && $extension->isBuildable()) {
             $clean = new MakeTask($this->logger, $this->options);
@@ -40,8 +40,8 @@ class ExtensionInstaller
             $clean->clean($extension);
         }
 
-        if ($extension->getConfigM4File() !== 'config.m4' && !file_exists($path . DIRECTORY_SEPARATOR . 'config.m4')) {
-            symlink($extension->getConfigM4File(), $path . DIRECTORY_SEPARATOR . 'config.m4');
+        if ($extension->getConfigM4File() !== 'config.m4' && !file_exists($sourceDirectory . DIRECTORY_SEPARATOR . 'config.m4')) {
+            symlink($extension->getConfigM4File(), $sourceDirectory . DIRECTORY_SEPARATOR . 'config.m4');
         }
 
         // If the php version is specified, we should get phpize with the correct version.
@@ -50,10 +50,10 @@ class ExtensionInstaller
 
         $this->logger->info('===> Configuring...');
 
-        $phpConfig = Config::getCurrentPhpConfigBin();
-        if (file_exists($phpConfig)) {
-            $this->logger->debug("Appending argument: --with-php-config=$phpConfig");
-            $configureOptions[] = '--with-php-config=' . $phpConfig;
+        $currentPhpConfigBin = Config::getCurrentPhpConfigBin();
+        if (file_exists($currentPhpConfigBin)) {
+            $this->logger->debug("Appending argument: --with-php-config=$currentPhpConfigBin");
+            $configureOptions[] = '--with-php-config=' . $currentPhpConfigBin;
         }
 
         $cmd = './configure ' . implode(' ', array_map('escapeshellarg', $configureOptions));

@@ -78,8 +78,8 @@ final class BuildSettings
      */
     public function setEnableVariants(array $settings): void
     {
-        foreach ($settings as $name) {
-            $this->setEnableVariant($name);
+        foreach ($settings as $setting) {
+            $this->setEnableVariant($setting);
         }
     }
 
@@ -108,8 +108,8 @@ final class BuildSettings
      */
     public function setDisableVariants(array $settings): void
     {
-        foreach ($settings as $name) {
-            $this->setDisableVariant($name);
+        foreach ($settings as $setting) {
+            $this->setDisableVariant($setting);
         }
     }
 
@@ -138,8 +138,8 @@ final class BuildSettings
      */
     public function setExtraOptions(array $settings): void
     {
-        foreach ($settings as $name) {
-            $this->setExtraOption($name);
+        foreach ($settings as $setting) {
+            $this->setExtraOption($setting);
         }
     }
 
@@ -153,8 +153,8 @@ final class BuildSettings
     ///////////////////////////////////////////////////////////////////////////
     public function resolveVariants(): void
     {
-        foreach ($this->disabled_variants as $name) {
-            $this->removeVariant($name);
+        foreach ($this->disabled_variants as $disabled_variant) {
+            $this->removeVariant($disabled_variant);
         }
     }
 
@@ -185,9 +185,6 @@ final class BuildSettings
         $this->loadVariantInfo($variant_info);
     }
 
-    /**
-     * @return int|false
-     */
     public function writeVariantInfoFile(string $variant_info_file): int|bool
     {
         $options = ['enabled_variants' => $this->enabled_variants, 'disabled_variants' => $this->disabled_variants, 'extra_options' => array_unique($this->extra_options)];
@@ -212,7 +209,7 @@ final class BuildSettings
         }
 
         if (isset($variant_info['extra_options'])) {
-            $this->extra_options = array_unique(array_merge($this->extra_options, $variant_info['extra_options']));
+            $this->extra_options = array_unique([...$this->extra_options, ...$variant_info['extra_options']]);
         }
 
         $this->resolveVariants();

@@ -128,17 +128,17 @@ class Console extends Application
         } catch (SystemCommandException $e) {
             // Todo: detect $lastline for library missing here...
 
-            $buildLog = $e->getLogFile();
+            $logFile = $e->getLogFile();
             $this->logger->error('Error: ' . trim($e->getMessage()));
 
-            if ($buildLog !== null && file_exists($buildLog)) {
+            if ($logFile !== null && file_exists($logFile)) {
                 $this->logger->error('The last 5 lines in the log file:');
-                $lines = array_slice(file($buildLog), -5);
+                $lines = array_slice(file($logFile), -5);
                 foreach ($lines as $line) {
                     echo $line , PHP_EOL;
                 }
                 $this->logger->error('Please checkout the build log file for more details:');
-                $this->logger->error("\t tail $buildLog");
+                $this->logger->error("\t tail $logFile");
             }
         } catch (BadMethodCallException $e) {
             $this->logger->error($e->getMessage());
