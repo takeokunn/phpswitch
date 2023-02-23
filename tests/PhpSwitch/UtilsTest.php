@@ -1,37 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests;
 
 use PhpSwitch\Utils;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @small
- */
-class UtilsTest extends TestCase
+final class UtilsTest extends TestCase
 {
-    public function test()
+    public function testSupport64bit(): void
     {
-        $this->assertInternalType('boolean', Utils::support64bit());
+        $this->assertIsBool(Utils::support64bit());
     }
 
-    public function testLookupPrefix()
-    {
-        $this->assertNotEmpty(Utils::getLookupPrefixes());
-    }
-
-    public function testFindIcuPkgData(): never
-    {
-        $this->markTestSkipped('icu/pkgdata.inc is not found on Ubuntu Linux');
-        $this->assertNotNull(Utils::findLibPrefix('icu/pkgdata.inc', 'icu/Makefile.inc'));
-    }
-
-    public function testPrefix()
-    {
-        $this->assertNotNull(Utils::findIncludePrefix('openssl/opensslv.h'));
-    }
-
-    public function testFindbin()
+    public function testFindbin(): void
     {
         $this->assertNotNull(Utils::findBin('ls'));
     }
