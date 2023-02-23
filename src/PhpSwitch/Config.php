@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 use Exception;
@@ -9,66 +11,76 @@ use Symfony\Component\Yaml\Yaml;
  * This config class provides settings based on the current environment
  * variables like PHPSWITCH_ROOT or PHPSWITCH_HOME.
  */
-class Config
+final class Config
 {
-    protected static $currentPhpVersion = null;
-
     /**
      * Return optional home directory.
      *
-     * @throws Exception
-     *
      * @return string
+     *
+     * @throws Exception
      */
-    public static function getHome()
+    public static function getHome(): string
     {
-        if ($custom = getenv('PHPSWITCH_HOME')) {
+        $home = getenv('HOME');
+        $custom = getenv('PHPSWITCH_HOME');
+
+        if (is_bool($custom) && is_bool($home)) {
+            throw new Exception('Environment variable PHPSWITCH_HOME or HOME is required');
+        }
+
+        if (is_string($custom)) {
             if (!file_exists($custom)) {
                 mkdir($custom, 0755, true);
             }
-
             return $custom;
         }
-        if ($home = getenv('HOME')) {
-            $path = $home . DIRECTORY_SEPARATOR . '.phpswitch';
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
 
-            return $path;
+        $path = $home . DIRECTORY_SEPARATOR . '.phpswitch';
+        if (is_string($home) && !file_exists($path)) {
+            mkdir($path, 0755, true);
         }
-        throw new Exception('Environment variable PHPSWITCH_HOME or HOME is required');
+
+        return $path;
     }
 
-    public static function setPhpswitchHome($home)
+    public static function setPhpswitchHome(string $home): void
     {
         putenv('PHPSWITCH_HOME=' . $home);
     }
 
-    public static function setPhpswitchRoot($root)
+    public static function setPhpswitchRoot(string $root): void
     {
         putenv('PHPSWITCH_ROOT=' . $root);
     }
 
-    public static function getRoot()
+    /**
+     * @throws Exception
+     */
+    public static function getRoot(): string
     {
-        if ($root = getenv('PHPSWITCH_ROOT')) {
+        $root = getenv('PHPSWITCH_ROOT');
+        $home = getenv('HOME');
+
+        if (is_bool($root) && is_bool($home)) {
+            throw new Exception('Environment variable PHPSWITCH_ROOT is required');
+        }
+
+        if (is_string($root)) {
             if (!file_exists($root)) {
                 mkdir($root, 0755, true);
             }
 
             return $root;
         }
-        if ($home = getenv('HOME')) {
-            return $home . DIRECTORY_SEPARATOR . '.phpswitch';
-        }
-        throw new Exception('Environment variable PHPSWITCH_ROOT is required');
+
+        return $home . DIRECTORY_SEPARATOR . '.phpswitch';
     }
 
     /**
      * cache directory for configure.
      */
-    public static function getCacheDir()
+    public static function getCacheDir(): string
     {
         return self::getRoot() . DIRECTORY_SEPARATOR . 'cache';
     }
@@ -76,17 +88,17 @@ class Config
     /**
      * php(s) could be global, so we use ROOT path.
      */
-    public static function getBuildDir()
+    public static function getBuildDir(): string
     {
         return self::getRoot() . DIRECTORY_SEPARATOR . 'build';
     }
 
-    public static function getCurrentBuildDir()
+    public static function getCurrentBuildDir(): string
     {
         return self::getRoot() . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . self::getCurrentPhpName();
     }
 
-    public static function getDistFileDir()
+    public static function getDistFileDir(): string
     {
         $dir = self::getRoot() . DIRECTORY_SEPARATOR . 'distfiles';
         if (!file_exists($dir)) {
@@ -96,7 +108,7 @@ class Config
         return $dir;
     }
 
-    public static function getTempFileDir()
+    public static function getTempFileDir(): string
     {
         $dir = self::getRoot() . DIRECTORY_SEPARATOR . 'tmp';
         if (!file_exists($dir)) {
@@ -106,7 +118,7 @@ class Config
         return $dir;
     }
 
-    public static function getPHPReleaseListPath()
+    public static function getPHPReleaseListPath(): string
     {
         // Release list from php.net
         return self::getRoot() . DIRECTORY_SEPARATOR . 'php-releases.json';
@@ -118,47 +130,44 @@ class Config
      * when PHPSWITCH_ROOT is pointing to /home/user/.phpswitch
      *
      * php(s) will be installed into /home/user/.phpswitch/php/php-{version}
-     *
-     * @return string
      */
-    public static function getInstallPrefix()
+    public static function getInstallPrefix(): string
     {
         return self::getRoot() . DIRECTORY_SEPARATOR . 'php';
     }
 
-    public static function getVersionInstallPrefix($buildName)
+    public static function getVersionInstallPrefix(string $name): string
     {
-        return self::getInstallPrefix() . DIRECTORY_SEPARATOR . $buildName;
+        return self::getInstallPrefix() . DIRECTORY_SEPARATOR . $name;
     }
 
     /**
      * XXX: This method should be migrated to PhpSwitch\Build class.
-     *
-     * @param string $buildName
-     *
-     * @return string
      */
-    public static function getVersionEtcPath($buildName)
+    public static function getVersionEtcPath(string $name): string
     {
-        return self::getVersionInstallPrefix($buildName) . DIRECTORY_SEPARATOR . 'etc';
+        return self::getVersionInstallPrefix($name) . DIRECTORY_SEPARATOR . 'etc';
     }
 
-    public static function getVersionBinPath($buildName)
+    public static function getVersionBinPath(string $name): string
     {
-        return self::getVersionInstallPrefix($buildName) . DIRECTORY_SEPARATOR . 'bin';
+        return self::getVersionInstallPrefix($name) . DIRECTORY_SEPARATOR . 'bin';
     }
 
-    public static function getCurrentPhpConfigBin()
+    public static function getCurrentPhpConfigBin(): string
     {
         return self::getCurrentPhpDir() . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'php-config';
     }
 
-    public static function getCurrentPhpizeBin()
+    public static function getCurrentPhpizeBin(): string
     {
         return self::getCurrentPhpDir() . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'phpize';
     }
 
-    public static function getSapis()
+    /**
+     * @return list<string>
+     */
+    public static function getSapis(): array
     {
         return ['cli', 'fpm', 'apache'];
     }
@@ -166,12 +175,12 @@ class Config
     /**
      * XXX: This method should be migrated to PhpSwitch\Build class.
      */
-    public static function getCurrentPhpConfigScanPath($home = false)
+    public static function getCurrentPhpConfigScanPath(bool $home = false): string
     {
         return self::getCurrentPhpDir($home) . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'db';
     }
 
-    public static function getCurrentPhpDir($home = false)
+    public static function getCurrentPhpDir(bool $home = false): string
     {
         if ($home) {
             return self::getHome() . DIRECTORY_SEPARATOR . 'php' . DIRECTORY_SEPARATOR . self::getCurrentPhpName();
@@ -181,31 +190,27 @@ class Config
     }
 
     /**
-     * getCurrentPhpName return the current php version from
-     * self::$currentPhpVersion or from environment variable `PHPSWITCH_PHP`.
-     *
-     * @return string
+     * getCurrentPhpName return the current php version from environment variable `PHPSWITCH_PHP`.
      */
-    public static function getCurrentPhpName()
+    public static function getCurrentPhpName(): string
     {
-        if (self::$currentPhpVersion !== null) {
-            return self::$currentPhpVersion;
-        }
-
-        return getenv('PHPSWITCH_PHP');
+        return strval(getenv('PHPSWITCH_PHP'));
     }
 
-    public static function getLookupPrefix()
+    public static function getLookupPrefix(): string
     {
         return getenv('PHPSWITCH_LOOKUP_PREFIX');
     }
 
-    public static function getCurrentPhpBin()
+    public static function getCurrentPhpBin(): string
     {
         return getenv('PHPSWITCH_PATH');
     }
 
-    public static function getConfig()
+    /**
+     * @return array<mixed>
+     */
+    public static function getConfig(): array
     {
         $configFile = self::getRoot() . DIRECTORY_SEPARATOR . 'config.yaml';
         if (!file_exists($configFile)) {
@@ -215,7 +220,7 @@ class Config
         return Yaml::parse(file_get_contents($configFile));
     }
 
-    public static function getConfigParam($param = null)
+    public static function getConfigParam(string $param): string
     {
         $config = self::getConfig();
         if ($param && isset($config[$param])) {

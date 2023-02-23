@@ -6,24 +6,25 @@
          backupGlobals="false"
          colors="true">
     <php>
-      <ini name="safe_mode_allowed_env_var" value="PHP_,PHPSWITCH"/>
-      <env name="PHPSWITCH_ROOT" value=".phpswitch"/>
-      <env name="PHPSWITCH_HOME" value=".phpswitch"/>
-      <env name="PHPSWITCH_EXTENSION_DIR" value="tests/fixtures/ext"/>
-      <env name="PHPSWITCH_FIXTURES_PHP_DIR" value="tests/fixtures/php"/>
-      <env name="PHPSWITCH_EXPECTED_PHP_DIR" value="tests/expected/php"/>
-      <env name="PHPSWITCH_BUILD_PHP_DIR" value="tests/build"/>
+        <ini name="safe_mode_allowed_env_var" value="PHP_,PHPSWITCH"/>
+        <env name="PHPSWITCH_ROOT" value=".phpswitch"/>
+        <env name="PHPSWITCH_HOME" value=".phpswitch"/>
+        <env name="PHPSWITCH_EXTENSION_DIR" value="tests/fixtures/ext"/>
+        <env name="PHPSWITCH_FIXTURES_PHP_DIR" value="tests/fixtures/php"/>
+        <env name="PHPSWITCH_EXPECTED_PHP_DIR" value="tests/expected/php"/>
+        <env name="PHPSWITCH_BUILD_PHP_DIR" value="tests/build"/>
     </php>
     <testsuites>
         <testsuite name="PHPSwitch">
             <directory>tests/PhpSwitch/BuildSettings</directory>
             <directory>tests/PhpSwitch/Distribution</directory>
             <file>tests/PhpSwitch/UtilsTest.php</file>
+            <file>tests/PhpSwitch/ConfigTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
-      <whitelist>
-        <directory>src</directory>
-      </whitelist>
+        <whitelist>
+            <directory>src</directory>
+        </whitelist>
     </filter>
 </phpunit>
