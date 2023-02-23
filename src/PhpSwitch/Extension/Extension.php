@@ -142,17 +142,17 @@ class Extension implements Buildable
         }
     }
 
-    public function isBuildable()
+    public function isBuildable(): bool
     {
         return file_exists($this->sourceDirectory . DIRECTORY_SEPARATOR . 'Makefile');
     }
 
-    public function getSourceDirectory()
+    public function getSourceDirectory(): string
     {
         return $this->sourceDirectory;
     }
 
-    public function getBuildLogPath()
+    public function getBuildLogPath(): string
     {
         return $this->sourceDirectory . DIRECTORY_SEPARATOR . 'build.log';
     }

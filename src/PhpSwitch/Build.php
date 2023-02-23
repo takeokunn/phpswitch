@@ -118,7 +118,7 @@ class Build implements Buildable
         $this->sourceDirectory = $dir;
     }
 
-    public function getSourceDirectory()
+    public function getSourceDirectory(): string
     {
         if ($this->sourceDirectory && !file_exists($this->sourceDirectory)) {
             mkdir($this->sourceDirectory, 0755, true);
@@ -127,12 +127,12 @@ class Build implements Buildable
         return $this->sourceDirectory;
     }
 
-    public function isBuildable()
+    public function isBuildable(): bool
     {
         return file_exists($this->sourceDirectory . DIRECTORY_SEPARATOR . 'Makefile');
     }
 
-    public function getBuildLogPath()
+    public function getBuildLogPath(): string
     {
         $dir = $this->getSourceDirectory() . DIRECTORY_SEPARATOR . 'build.log';
         return $dir;

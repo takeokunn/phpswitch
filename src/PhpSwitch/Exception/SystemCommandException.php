@@ -11,7 +11,7 @@ final class SystemCommandException extends RuntimeException
 {
     public function __construct(
         string $message,
-        protected Buildable $buildable
+        protected Buildable $build
     ) {
         parent::__construct($message);
     }
