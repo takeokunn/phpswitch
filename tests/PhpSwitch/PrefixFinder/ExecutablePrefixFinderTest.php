@@ -1,24 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests\PrefixFinder;
 
-use PhpSwitch\PrefixFinder\ExecutablePrefixFinder;
 use PHPUnit\Framework\TestCase;
+use PhpSwitch\PrefixFinder\ExecutablePrefixFinder;
 
-/**
- * @group prefixfinder
- */
-class ExecutablePrefixFinderTest extends \PHPUnit\Framework\TestCase
+final class ExecutablePrefixFinderTest extends TestCase
 {
-    public function testFindValid()
+    public function testFindValid(): void
     {
-        $executablePrefixFinder = new \PhpSwitch\PrefixFinder\ExecutablePrefixFinder('ls');
+        $executablePrefixFinder = new ExecutablePrefixFinder('ls');
         $this->assertNotNull($executablePrefixFinder->findPrefix());
     }
 
-    public function testFindInvalid()
+    public function testFindInvalid(): void
     {
-        $executablePrefixFinder = new \PhpSwitch\PrefixFinder\ExecutablePrefixFinder('inexistent-binary');
+        $executablePrefixFinder = new ExecutablePrefixFinder('inexistent-binary');
         $this->assertNull($executablePrefixFinder->findPrefix());
     }
 }

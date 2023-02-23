@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\PrefixFinder;
 
-use PhpSwitch\PrefixFinder;
 use PhpSwitch\Utils;
+use PhpSwitch\PrefixFinder;
 
 /**
  * The strategy of finding prefix by an executable file.
@@ -13,21 +15,17 @@ final class ExecutablePrefixFinder implements PrefixFinder
     /**
      * @param string $name Executable name
      */
-    public function __construct(private $name)
-    {
+    public function __construct(
+        private readonly string $name
+    ) {
     }
 
     /**
      * {@inheritDoc}
      */
-    public function findPrefix()
+    public function findPrefix(): ?string
     {
         $bin = Utils::findBin($this->name);
-
-        if ($bin === null) {
-            return null;
-        }
-
-        return dirname($bin);
+        return isset($bin) ? dirname($bin) : null;
     }
 }

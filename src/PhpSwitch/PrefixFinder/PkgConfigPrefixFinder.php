@@ -20,7 +20,7 @@ final class PkgConfigPrefixFinder implements PrefixFinder
     /**
      * {@inheritDoc}
      */
-    public function findPrefix()
+    public function findPrefix(): ?string
     {
         return Utils::getPkgConfigPrefix($this->package);
     }

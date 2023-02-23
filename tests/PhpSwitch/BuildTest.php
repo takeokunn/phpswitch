@@ -5,9 +5,6 @@ namespace PhpSwitch\Tests;
 use PhpSwitch\Build;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @small
- */
 class BuildTest extends TestCase
 {
     public function testBuildAPI()

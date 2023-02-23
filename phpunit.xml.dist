@@ -22,6 +22,7 @@
             <file>tests/PhpSwitch/ConfigTest.php</file>
             <file>tests/PhpSwitch/VersionDslParser.php</file>
             <file>tests/PhpSwitch/VariantParserTest.php</file>
+            <file>tests/PhpSwitch/PrefixFinder/ExecutablePrefixFinderTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
