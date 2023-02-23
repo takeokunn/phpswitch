@@ -37,9 +37,7 @@ class KnownCommand extends Command
 
                 return array_filter(
                     scandir($extdir),
-                    function ($d) use ($extdir) {
-                        return $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d);
-                    }
+                    fn($d) => $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d)
                 );
             });
     }

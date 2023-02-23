@@ -17,9 +17,7 @@ class EnvCommand extends BaseCommand
     {
         $args->add('PHP build')
             ->optional()
-            ->validValues(function () {
-                return BuildFinder::findInstalledBuilds();
-            })
+            ->validValues(fn() => BuildFinder::findInstalledBuilds())
             ;
     }
 

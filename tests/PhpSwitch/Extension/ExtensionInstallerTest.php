@@ -38,20 +38,19 @@ class ExtensionInstallerTest extends CommandTestCase
         $logger = new Logger();
         $logger->setQuiet();
         $peclProvider = new PeclProvider($logger, new OptionResult());
-        $downloader = new ExtensionDownloader($logger, new OptionResult());
+        $extensionDownloader = new ExtensionDownloader($logger, new OptionResult());
         $peclProvider->setPackageName('APCu');
-        $extractPath = $downloader->download($peclProvider, 'latest');
+        $extractPath = $extensionDownloader->download($peclProvider, 'latest');
         $this->assertFileExists($extractPath);
     }
 
     public function packageNameProvider()
     {
-        return array(
+        return [
             // xdebug requires at least php 5.4
             // array('xdebug'),
-            array(version_compare(PHP_VERSION, '5.5', '=='),'APCu', 'stable', array()),
-            // array(version_compare(PHP_VERSION, '5.5', '=='),'yaml', 'stable', array()),
-        );
+            [version_compare(PHP_VERSION, '5.5', '=='), 'APCu', 'stable', []],
+        ];
     }
 
     /**
@@ -65,13 +64,13 @@ class ExtensionInstallerTest extends CommandTestCase
         }
         $logger = new Logger();
         $logger->setDebug();
-        $manager = new ExtensionManager($logger);
+        $extensionManager = new ExtensionManager($logger);
         $peclProvider = new PeclProvider();
-        $downloader = new ExtensionDownloader($logger, new OptionResult());
+        $extensionDownloader = new ExtensionDownloader($logger, new OptionResult());
         $peclProvider->setPackageName($extensionName);
-        $downloader->download($peclProvider, $extensionVersion);
+        $extensionDownloader->download($peclProvider, $extensionVersion);
         $ext = ExtensionFactory::lookup($extensionName);
         $this->assertNotNull($ext);
-        $manager->installExtension($ext, $options);
+        $extensionManager->installExtension($ext, $options);
     }
 }

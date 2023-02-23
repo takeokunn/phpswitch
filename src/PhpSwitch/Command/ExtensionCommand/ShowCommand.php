@@ -33,32 +33,22 @@ class ShowCommand extends BaseCommand
 
                 return array_filter(
                     scandir($extdir),
-                    function ($d) use ($extdir) {
-                        return $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d);
-                    }
+                    fn($d) => $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d)
                 );
             });
     }
 
-    public function describeExtension(Extension $ext)
+    public function describeExtension(Extension $extension)
     {
-        $info = array(
-            'Name' => $ext->getExtensionName(),
-            'Source Directory' => $ext->getSourceDirectory(),
-            'Config' => $ext->getConfigM4Path(),
-            'INI File' => $ext->getConfigFilePath(),
-            'Extension' => ($ext instanceof PeclExtension) ? 'Pecl' : 'Core',
-            'Zend' => $ext->isZend() ? 'yes' : 'no',
-            'Loaded' => (extension_loaded($ext->getExtensionName())
-                ? $this->formatter->format('yes', 'green')
-                : $this->formatter->format('no', 'red')),
-        );
+        $info = ['Name' => $extension->getExtensionName(), 'Source Directory' => $extension->getSourceDirectory(), 'Config' => $extension->getConfigM4Path(), 'INI File' => $extension->getConfigFilePath(), 'Extension' => ($extension instanceof PeclExtension) ? 'Pecl' : 'Core', 'Zend' => $extension->isZend() ? 'yes' : 'no', 'Loaded' => (extension_loaded($extension->getExtensionName())
+            ? $this->formatter->format('yes', 'green')
+            : $this->formatter->format('no', 'red'))];
 
         foreach ($info as $label => $val) {
             $this->logger->writeln(sprintf('%20s: %s', $label, $val));
         }
 
-        $options = $ext->getConfigureOptions();
+        $options = $extension->getConfigureOptions();
         if (!empty($options)) {
             $this->logger->newline();
             $this->logger->writeln(sprintf('%20s: ', 'Configure Options'));
@@ -90,10 +80,10 @@ class ShowCommand extends BaseCommand
 
             $hosting = $extensionList->exists($extensionName);
 
-            $downloader = new ExtensionDownloader($this->logger, $this->options);
-            $extDir = $downloader->download($hosting, 'latest');
+            $extensionDownloader = new ExtensionDownloader($this->logger, $this->options);
+            $extDir = $extensionDownloader->download($hosting, 'latest');
             // Reload the extension
-            $ext = ExtensionFactory::lookupRecursive($extensionName, array($extDir));
+            $ext = ExtensionFactory::lookupRecursive($extensionName, [$extDir]);
         }
         if (!$ext) {
             throw new Exception("$extensionName extension not found.");

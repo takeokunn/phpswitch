@@ -15,14 +15,11 @@ class CompletionTest extends CommandTestCase
             file_get_contents(__DIR__ . '/../../completion/' . $shell . '/_phpswitch')
         );
 
-        $this->app->run(array('phpswitch', $shell, '--bind', 'phpswitch', '--program', 'phpswitch'));
+        $this->app->run(['phpswitch', $shell, '--bind', 'phpswitch', '--program', 'phpswitch']);
     }
 
     public static function completionProvider()
     {
-        return array(
-            'bash' => array('bash'),
-            'zsh' => array('zsh'),
-        );
+        return ['bash' => ['bash'], 'zsh' => ['zsh']];
     }
 }

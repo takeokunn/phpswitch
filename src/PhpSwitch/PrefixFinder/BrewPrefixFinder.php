@@ -11,16 +11,10 @@ use PhpSwitch\Utils;
 final class BrewPrefixFinder implements PrefixFinder
 {
     /**
-     * @var string
-     */
-    private $formula;
-
-    /**
      * @param string $formula Homebrew formula
      */
-    public function __construct($formula)
+    public function __construct(private $formula)
     {
-        $this->formula = $formula;
     }
 
     /**
@@ -55,7 +49,7 @@ final class BrewPrefixFinder implements PrefixFinder
 
     private function execLine($command)
     {
-        $output = array();
+        $output = [];
         exec($command, $output, $retval);
 
         if ($retval === 0) {

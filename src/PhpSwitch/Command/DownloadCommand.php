@@ -31,14 +31,14 @@ class DownloadCommand extends Command
             $releaseList = ReleaseList::getReadyInstance();
             $releases = $releaseList->getReleases();
 
-            $collection = new ValueCollection();
+            $valueCollection = new ValueCollection();
             foreach ($releases as $major => $versions) {
-                $collection->group($major, "PHP $major", array_keys($versions));
+                $valueCollection->group($major, "PHP $major", array_keys($versions));
             }
 
-            $collection->group('pseudo', 'pseudo', array('latest', 'next'));
+            $valueCollection->group('pseudo', 'pseudo', ['latest', 'next']);
 
-            return $collection;
+            return $valueCollection;
         });
     }
 
@@ -55,22 +55,22 @@ class DownloadCommand extends Command
 
     public function execute($version)
     {
-        $version = preg_replace('/^php-/', '', $version);
+        $version = preg_replace('/^php-/', '', (string) $version);
         $releaseList = ReleaseList::getReadyInstance($this->options);
         $versionInfo = $releaseList->getVersion($version);
         if (!$versionInfo) {
             throw new Exception("Version $version not found.");
         }
         $version = $versionInfo['version'];
-        $distUrlPolicy = new DistributionUrlPolicy();
-        $distUrl = $distUrlPolicy->buildUrl($version, $versionInfo['filename'], $versionInfo['museum']);
+        $distributionUrlPolicy = new DistributionUrlPolicy();
+        $distUrl = $distributionUrlPolicy->buildUrl($version, $versionInfo['filename'], $versionInfo['museum']);
 
-        $prepare = new PrepareDirectoryTask($this->logger, $this->options);
-        $prepare->run();
+        $prepareDirectoryTask = new PrepareDirectoryTask($this->logger, $this->options);
+        $prepareDirectoryTask->run();
 
         $distFileDir = Config::getDistFileDir();
 
-        $download = new DownloadTask($this->logger, $this->options);
+        $downloadTask = new DownloadTask($this->logger, $this->options);
         $algo = 'md5';
         $hash = null;
         if (isset($versionInfo['sha256'])) {
@@ -80,7 +80,7 @@ class DownloadCommand extends Command
             $algo = 'md5';
             $hash = $versionInfo['md5'];
         }
-        $targetDir = $download->download($distUrl, $distFileDir, $algo, $hash);
+        $targetDir = $downloadTask->download($distUrl, $distFileDir, $algo, $hash);
 
         if (!file_exists($targetDir)) {
             throw new Exception('Download failed.');

@@ -11,9 +11,9 @@ abstract class CommandTestCase extends BaseCommandTestCase
 {
     protected $debug = false;
 
-    private $previousPhpSwitchRoot;
+    private string|bool $previousPhpSwitchRoot;
 
-    private $previousPhpSwitchHome;
+    private string|bool $previousPhpSwitchHome;
 
     public $primaryVersion = '7.0.33';
 

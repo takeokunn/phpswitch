@@ -10,8 +10,6 @@ use PhpSwitch\Buildable;
  */
 class RegExpPatchRule implements PatchRule
 {
-    private $files;
-
     /**
      * @var string the regexp pattern
      */
@@ -25,9 +23,8 @@ class RegExpPatchRule implements PatchRule
     /**
      * @param string $files
      */
-    public function __construct(array $files)
+    public function __construct(private readonly array $files)
     {
-        $this->files = $files;
     }
 
     /**
@@ -91,7 +88,7 @@ class RegExpPatchRule implements PatchRule
         $size = count($lines);
         for ($i = 0; $i < $size; ++$i) {
             if ($this->predicator === true || call_user_func($this->predicator, $lines[$i])) {
-                $lines[$i] = preg_replace($this->pattern, $this->replacement, $lines[$i], -1, $count);
+                $lines[$i] = preg_replace($this->pattern, $this->replacement, (string) $lines[$i], -1, $count);
                 $patched += $count;
             }
         }
@@ -110,10 +107,10 @@ class RegExpPatchRule implements PatchRule
         return $this->applyLines(preg_split("/(?:\r\n|\n|\r)/", $content), $patched);
     }
 
-    public function backup(Buildable $build, Logger $logger)
+    public function backup(Buildable $buildable, Logger $logger)
     {
         foreach ($this->files as $file) {
-            $path = $build->getSourceDirectory() . DIRECTORY_SEPARATOR . $file;
+            $path = $buildable->getSourceDirectory() . DIRECTORY_SEPARATOR . $file;
             if (!file_exists($path)) {
                 $logger->error("file $path doesn't exist in the build directory.");
                 continue;
@@ -128,11 +125,11 @@ class RegExpPatchRule implements PatchRule
         copy($path, $bakPath);
     }
 
-    public function apply(Buildable $build, Logger $logger)
+    public function apply(Buildable $buildable, Logger $logger)
     {
         $patched = 0;
         foreach ($this->files as $file) {
-            $path = $build->getSourceDirectory() . DIRECTORY_SEPARATOR . $file;
+            $path = $buildable->getSourceDirectory() . DIRECTORY_SEPARATOR . $file;
             if (!file_exists($path)) {
                 $logger->error("file $path doesn't exist in the build directory.");
                 continue;

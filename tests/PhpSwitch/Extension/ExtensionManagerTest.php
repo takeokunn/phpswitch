@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExtensionManagerTest extends TestCase
 {
-    private $manager;
+    private \PhpSwitch\Extension\ExtensionManager $manager;
 
     protected function setUp(): void
     {
@@ -34,7 +34,7 @@ class ExtensionManagerTest extends TestCase
 
     public function testCleanExtension()
     {
-        $ext = ExtensionFactory::lookup('xdebug', array(getenv('PHPSWITCH_EXTENSION_DIR')));
+        $ext = ExtensionFactory::lookup('xdebug', [getenv('PHPSWITCH_EXTENSION_DIR')]);
         $this->assertTrue($this->manager->cleanExtension($ext));
     }
 }

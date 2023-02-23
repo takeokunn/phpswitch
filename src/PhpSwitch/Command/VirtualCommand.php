@@ -13,7 +13,7 @@ class VirtualCommand extends Command
     /**
      * @throws Exception
      */
-    final public function execute()
+    final public function execute(): never
     {
         throw new Exception(
             "You should not see this. "

@@ -12,11 +12,10 @@ class WgetCommandDownloader extends BaseDownloader
     /**
      * @param string $url
      *
-     * @return bool|string
      *
      * @throws RuntimeException
      */
-    protected function process($url, $targetFilePath)
+    protected function process($url, $targetFilePath): bool|string
     {
         $this->logger->info("Downloading $url via wget command");
 
@@ -40,7 +39,7 @@ class WgetCommandDownloader extends BaseDownloader
             $continue,
             $quiet,
             $proxy,
-            escapeshellarg($targetFilePath),
+            escapeshellarg((string) $targetFilePath),
             escapeshellarg($url)
         ));
 

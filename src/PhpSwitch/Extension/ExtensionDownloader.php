@@ -15,10 +15,10 @@ class ExtensionDownloader
 
     public $options;
 
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(Logger $logger, OptionResult $optionResult)
     {
         $this->logger = $logger;
-        $this->options = $options;
+        $this->options = $optionResult;
     }
 
     public function download(Provider $provider, $version = 'stable')
@@ -61,21 +61,18 @@ class ExtensionDownloader
         return $provider->parseKnownReleasesResponse($info);
     }
 
-    public function renameSourceDirectory(Extension $ext)
+    public function renameSourceDirectory(Extension $extension)
     {
         $currentPhpExtensionDirectory = Config::getBuildDir() . '/' . Config::getCurrentPhpName() . '/ext';
-        $extName = $ext->getExtensionName();
-        $name = $ext->getName();
+        $extName = $extension->getExtensionName();
+        $name = $extension->getName();
         $extensionDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $extName;
         $extensionExtractDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $name;
 
         if ($name != $extName) {
             $this->logger->info("===> Rename source directory to $extensionDir...");
 
-            $cmds = array(
-                "rm -rf $extensionDir",
-                "mv $extensionExtractDir $extensionDir",
-            );
+            $cmds = ["rm -rf $extensionDir", "mv $extensionExtractDir $extensionDir"];
 
             foreach ($cmds as $cmd) {
                 $this->logger->debug($cmd);
@@ -83,9 +80,9 @@ class ExtensionDownloader
             }
 
             // replace source directory to new source directory
-            $sourceDir = str_replace($extensionExtractDir, $extensionDir, $ext->getSourceDirectory());
-            $ext->setSourceDirectory($sourceDir);
-            $ext->setName($extName);
+            $sourceDir = str_replace($extensionExtractDir, $extensionDir, $extension->getSourceDirectory());
+            $extension->setSourceDirectory($sourceDir);
+            $extension->setName($extName);
         }
     }
 }

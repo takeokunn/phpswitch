@@ -12,14 +12,14 @@ final class ConfigureParameters
      *
      * @var array<string,string|null>
      */
-    private $options = array();
+    private array $options = [];
 
     /**
      * Paths passed to the command via the PKG_CONFIG_PATH environment variable
      *
      * @var array<string,null>
      */
-    private $pkgConfigPaths = array();
+    private array $pkgConfigPaths = [];
 
     /**
      * Creates a new object with the given option and the value.

@@ -21,11 +21,7 @@ class ConfigCommand extends BaseCommand
     public function arguments($args)
     {
         $args->add('extensions')
-            ->suggestions(function () {
-                return array_map(function ($path) {
-                    return basename(basename($path, '.disabled'), '.ini');
-                }, glob(Config::getCurrentPhpDir() . '/var/db/*.{ini,disabled}', GLOB_BRACE));
-            });
+            ->suggestions(fn() => array_map(fn($path) => basename(basename($path, '.disabled'), '.ini'), glob(Config::getCurrentPhpDir() . '/var/db/*.{ini,disabled}', GLOB_BRACE)));
     }
 
     public function options($opts)

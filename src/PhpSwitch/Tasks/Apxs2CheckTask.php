@@ -8,9 +8,9 @@ use PhpSwitch\Utils;
 
 class Apxs2CheckTask extends BaseTask
 {
-    public function check(ConfigureParameters $parameters)
+    public function check(ConfigureParameters $configureParameters)
     {
-        $options = $parameters->getOptions();
+        $options = $configureParameters->getOptions();
 
         if (isset($options['--with-apxs2'])) {
             $apxs = $options['--with-apxs2'];

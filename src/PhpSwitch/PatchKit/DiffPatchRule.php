@@ -15,10 +15,7 @@ final class DiffPatchRule implements PatchRule
      */
     private $patch;
 
-    /**
-     * @var int
-     */
-    private $strip = 0;
+    private int $strip = 0;
 
     private function __construct()
     {
@@ -41,29 +38,25 @@ final class DiffPatchRule implements PatchRule
      */
     public static function fromPatch($patch)
     {
-        $instance = new self();
-        $instance->patch = $patch;
+        $self = new self();
+        $self->patch = $patch;
 
-        return $instance;
+        return $self;
     }
 
-    public function backup(Buildable $build, Logger $logger)
+    public function backup(Buildable $buildable, Logger $logger)
     {
     }
 
-    public function apply(Buildable $build, Logger $logger)
+    public function apply(Buildable $buildable, Logger $logger)
     {
         $logger->info('---> Applying patch...');
 
         $process = proc_open(
             sprintf('patch --forward --backup -p%d', $this->strip),
-            array(
-                array('pipe', 'r'),
-                array('pipe', 'w'),
-                array('pipe', 'w'),
-            ),
+            [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']],
             $pipes,
-            $build->getSourceDirectory()
+            $buildable->getSourceDirectory()
         );
 
         if (fwrite($pipes[0], $this->patch) === false) {

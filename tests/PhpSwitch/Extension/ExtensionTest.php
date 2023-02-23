@@ -30,9 +30,9 @@ class ExtensionTest extends TestCase
      */
     public function testXdebug()
     {
-        $ext = ExtensionFactory::lookup('xdebug', array(getenv('PHPSWITCH_EXTENSION_DIR')));
-        $this->assertInstanceOf('PhpSwitch\Extension\Extension', $ext);
-        $this->assertInstanceOf('PhpSwitch\Extension\PeclExtension', $ext);
+        $ext = ExtensionFactory::lookup('xdebug', [getenv('PHPSWITCH_EXTENSION_DIR')]);
+        $this->assertInstanceOf(\PhpSwitch\Extension\Extension::class, $ext);
+        $this->assertInstanceOf(\PhpSwitch\Extension\PeclExtension::class, $ext);
         $this->assertEquals('xdebug', $ext->getName());
         $this->assertEquals('xdebug', $ext->getExtensionName());
         $this->assertEquals('xdebug.so', $ext->getSharedLibraryName());
@@ -41,7 +41,7 @@ class ExtensionTest extends TestCase
 
     public function testOpcache()
     {
-        $ext = ExtensionFactory::lookup('opcache', array(getenv('PHPSWITCH_EXTENSION_DIR')));
+        $ext = ExtensionFactory::lookup('opcache', [getenv('PHPSWITCH_EXTENSION_DIR')]);
         $this->assertInstanceOf('Phpswitch\Extension\Extension', $ext);
         $this->assertInstanceOf('Phpswitch\Extension\M4Extension', $ext);
         $this->assertEquals('opcache', $ext->getName());
@@ -52,9 +52,9 @@ class ExtensionTest extends TestCase
 
     public function testOpenSSL()
     {
-        $ext = ExtensionFactory::lookup('openssl', array(getenv('PHPSWITCH_EXTENSION_DIR')));
-        $this->assertInstanceOf('PhpSwitch\Extension\Extension', $ext);
-        $this->assertInstanceOf('PhpSwitch\Extension\M4Extension', $ext);
+        $ext = ExtensionFactory::lookup('openssl', [getenv('PHPSWITCH_EXTENSION_DIR')]);
+        $this->assertInstanceOf(\PhpSwitch\Extension\Extension::class, $ext);
+        $this->assertInstanceOf(\PhpSwitch\Extension\M4Extension::class, $ext);
         $this->assertEquals('openssl', $ext->getName());
         $this->assertEquals('openssl', $ext->getExtensionName());
         $this->assertEquals('openssl.so', $ext->getSharedLibraryName());
@@ -63,9 +63,9 @@ class ExtensionTest extends TestCase
 
     public function testSoap()
     {
-        $ext = ExtensionFactory::lookup('soap', array(getenv('PHPSWITCH_EXTENSION_DIR')));
-        $this->assertInstanceOf('PhpSwitch\Extension\Extension', $ext);
-        $this->assertInstanceOf('PhpSwitch\Extension\PeclExtension', $ext);
+        $ext = ExtensionFactory::lookup('soap', [getenv('PHPSWITCH_EXTENSION_DIR')]);
+        $this->assertInstanceOf(\PhpSwitch\Extension\Extension::class, $ext);
+        $this->assertInstanceOf(\PhpSwitch\Extension\PeclExtension::class, $ext);
         $this->assertEquals('soap', $ext->getName());
         $this->assertEquals('soap', $ext->getExtensionName());
         $this->assertEquals('soap.so', $ext->getSharedLibraryName());
@@ -74,7 +74,7 @@ class ExtensionTest extends TestCase
 
     public function testSplTypes()
     {
-        $ext = ExtensionFactory::lookup('SPL_Types', array(getenv('PHPSWITCH_EXTENSION_DIR')));
+        $ext = ExtensionFactory::lookup('SPL_Types', [getenv('PHPSWITCH_EXTENSION_DIR')]);
         $this->assertInstanceOf('Phpswitch\Extension\Extension', $ext);
         $this->assertInstanceOf('Phpswitch\Extension\PeclExtension', $ext);
         $this->assertEquals('SPL_Types', $ext->getName());
@@ -85,7 +85,7 @@ class ExtensionTest extends TestCase
 
     public function testXhprof()
     {
-        $ext = ExtensionFactory::lookup('xhprof', array(getenv('PHPSWITCH_EXTENSION_DIR')));
+        $ext = ExtensionFactory::lookup('xhprof', [getenv('PHPSWITCH_EXTENSION_DIR')]);
         $this->assertInstanceOf('Phpswitch\Extension\Extension', $ext);
         $this->assertInstanceOf('Phpswitch\Extension\PeclExtension', $ext);
         $this->assertEquals('xhprof', $ext->getName());
@@ -97,13 +97,13 @@ class ExtensionTest extends TestCase
     public function extensionNameProvider()
     {
         $extNames = scandir(getenv('PHPSWITCH_EXTENSION_DIR'));
-        $data = array();
+        $data = [];
 
         foreach ($extNames as $extName) {
             if ($extName == "." || $extName == "..") {
                 continue;
             }
-            $data[] = array($extName);
+            $data[] = [$extName];
         }
         return $data;
     }
@@ -114,8 +114,8 @@ class ExtensionTest extends TestCase
      */
     public function testGenericExtensionMetaInformation($extName)
     {
-        $ext = ExtensionFactory::lookup($extName, array(getenv('PHPSWITCH_EXTENSION_DIR')));
-        $this->assertInstanceOf('PhpSwitch\Extension\Extension', $ext);
+        $ext = ExtensionFactory::lookup($extName, [getenv('PHPSWITCH_EXTENSION_DIR')]);
+        $this->assertInstanceOf(\PhpSwitch\Extension\Extension::class, $ext);
         $this->assertNotEmpty($ext->getName());
     }
 }

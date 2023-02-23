@@ -22,9 +22,7 @@ class RemoveCommand extends Command
     public function arguments($args)
     {
         $args->add('installed php')
-            ->validValues(function () {
-                return BuildFinder::findInstalledBuilds();
-            })
+            ->validValues(fn() => BuildFinder::findInstalledBuilds())
             ;
     }
 
@@ -35,8 +33,8 @@ class RemoveCommand extends Command
             throw new Exception("$prefix does not exist.");
         }
         $prompter = new Prompter();
-        $answer = $prompter->ask("Are you sure to delete $buildName?", array('Y', 'n'), 'Y');
-        if (strtolower($answer) == 'y') {
+        $answer = $prompter->ask("Are you sure to delete $buildName?", ['Y', 'n'], 'Y');
+        if (strtolower((string) $answer) == 'y') {
             Utils::recursive_unlink($prefix, $this->logger);
             $this->logger->info("$buildName is removed.  I hope you're not surprised. :)");
         } else {

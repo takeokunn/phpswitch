@@ -15,7 +15,7 @@ class ExtractTask extends BaseTask
      *
      * @var string[]
      */
-    private $rmDirs = array();
+    private array $rmDirs = [];
 
     /**
      * Unpacks the source tarball file.
@@ -99,8 +99,8 @@ class ExtractTask extends BaseTask
 
     public function __destruct()
     {
-        foreach ($this->rmDirs as $dir) {
-            $this->rmDir($dir);
+        foreach ($this->rmDirs as $rmDir) {
+            $this->rmDir($rmDir);
         }
 
         parent::__destruct();
@@ -108,6 +108,6 @@ class ExtractTask extends BaseTask
 
     private function rmDir($dir, &$return = null)
     {
-        return system('rm -rf ' . escapeshellarg($dir), $return);
+        return system('rm -rf ' . escapeshellarg((string) $dir), $return);
     }
 }

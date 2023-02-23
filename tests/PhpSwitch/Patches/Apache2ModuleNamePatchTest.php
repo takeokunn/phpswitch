@@ -14,10 +14,7 @@ class Apache2ModuleNamePatchTest extends PatchTestCase
 {
     public function versionProvider()
     {
-        return array(
-            array('5.5.17', 107, '/Makefile.global'),
-            array('7.4.0', 25, '/build/Makefile.global')
-        );
+        return [['5.5.17', 107, '/Makefile.global'], ['7.4.0', 25, '/build/Makefile.global']];
     }
 
     /**
@@ -41,10 +38,10 @@ class Apache2ModuleNamePatchTest extends PatchTestCase
         $build->enableVariant('apxs2');
         $this->assertTrue($build->isEnabledVariant('apxs2'));
 
-        $patch = new Apache2ModuleNamePatch($version);
-        $matched = $patch->match($build, $logger);
+        $apache2ModuleNamePatch = new Apache2ModuleNamePatch($version);
+        $matched = $apache2ModuleNamePatch->match($build, $logger);
         $this->assertTrue($matched, 'patch matched');
-        $patchedCount = $patch->apply($build, $logger);
+        $patchedCount = $apache2ModuleNamePatch->apply($build, $logger);
 
         $expectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . $version . '-apxs-patch';
         $this->assertEquals($expectedPatchedCount, $patchedCount);

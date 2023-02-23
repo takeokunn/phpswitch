@@ -18,12 +18,12 @@ abstract class BaseTask
 
     public $finishedAt;
 
-    public function __construct(Logger $logger, OptionResult $options = null)
+    public function __construct(Logger $logger, OptionResult $optionResult = null)
     {
         $this->startedAt = microtime(true);
         $this->logger = $logger;
-        if ($options) {
-            $this->options = $options;
+        if ($optionResult) {
+            $this->options = $optionResult;
         } else {
             $this->options = new OptionResult();
         }

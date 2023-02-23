@@ -26,9 +26,7 @@ class CleanCommand extends BaseCommand
 
                 return array_filter(
                     scandir($extdir),
-                    function ($d) use ($extdir) {
-                        return $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d);
-                    }
+                    fn($d) => $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d)
                 );
             });
     }
@@ -37,12 +35,12 @@ class CleanCommand extends BaseCommand
     {
         if ($ext = ExtensionFactory::lookup($extensionName)) {
             $this->logger->info("Cleaning $extensionName...");
-            $manager = new ExtensionManager($this->logger);
+            $extensionManager = new ExtensionManager($this->logger);
 
             if ($this->options->purge) {
-                $manager->purgeExtension($ext);
+                $extensionManager->purgeExtension($ext);
             } else {
-                $manager->cleanExtension($ext);
+                $extensionManager->cleanExtension($ext);
             }
             $this->logger->info('Done');
         }

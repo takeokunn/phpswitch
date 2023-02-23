@@ -17,7 +17,7 @@ abstract class Patch
      */
     abstract public function desc();
 
-    abstract public function match(Buildable $build, Logger $logger);
+    abstract public function match(Buildable $buildable, Logger $logger);
 
     /**
      * rules method returns the array of PatchRule class.
@@ -29,16 +29,16 @@ abstract class Patch
     /**
      * Each patch may implement its own logic to patch the file.
      */
-    public function apply(Buildable $build, Logger $logger)
+    public function apply(Buildable $buildable, Logger $logger)
     {
         $cnt = 0;
         if ($rules = $this->rules()) {
             // todo: should backup all files in one time (some patch rules have the same file names)
             foreach ($rules as $rule) {
-                $rule->backup($build, $logger);
+                $rule->backup($buildable, $logger);
             }
             foreach ($rules as $rule) {
-                if ($patched = $rule->apply($build, $logger)) {
+                if ($patched = $rule->apply($buildable, $logger)) {
                     $cnt += $patched;
                 }
             }

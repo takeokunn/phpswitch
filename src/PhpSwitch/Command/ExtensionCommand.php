@@ -14,7 +14,7 @@ class ExtensionCommand extends BaseCommand
 {
     public function aliases()
     {
-        return array('ext');
+        return ['ext'];
     }
 
     public function usage()
@@ -47,17 +47,17 @@ class ExtensionCommand extends BaseCommand
         $opts->add('sp|show-path', 'Show extension config.m4 path');
     }
 
-    public function describeExtension(Extension $ext)
+    public function describeExtension(Extension $extension)
     {
         $this->logger->write(sprintf(
             ' [%s] %-12s %-12s',
-            extension_loaded($ext->getExtensionName()) ? '*' : ' ',
-            $ext->getExtensionName(),
-            phpversion($ext->getExtensionName())
+            extension_loaded($extension->getExtensionName()) ? '*' : ' ',
+            $extension->getExtensionName(),
+            phpversion($extension->getExtensionName())
         ));
 
         if ($this->options->{'show-path'}) {
-            $this->logger->write(sprintf(' from %s', $ext->getConfigM4Path()));
+            $this->logger->write(sprintf(' from %s', $extension->getConfigM4Path()));
         }
         $this->logger->newline();
 
@@ -65,8 +65,8 @@ class ExtensionCommand extends BaseCommand
 
         if ($this->options->{'show-options'}) {
             $padding = '     ';
-            if ($ext instanceof M4Extension) {
-                $options = $ext->getConfigureOptions();
+            if ($extension instanceof M4Extension) {
+                $options = $extension->getConfigureOptions();
                 if (!empty($options)) {
                     $this->logger->info($padding . 'Configure options:');
                     foreach ($options as $option) {
@@ -87,11 +87,11 @@ class ExtensionCommand extends BaseCommand
         $extDir = $buildDir . DIRECTORY_SEPARATOR . 'ext';
 
         // list for extensions which are not enabled
-        $extensions = array();
-        $extensionNames = array();
+        $extensions = [];
+        $extensionNames = [];
 
         // some extension source not in root directory
-        $lookupDirectories = array('', 'ext', 'extension');
+        $lookupDirectories = ['', 'ext', 'extension'];
 
         if (file_exists($extDir) && is_dir($extDir)) {
             $this->logger->debug("Scanning $extDir...");
@@ -112,7 +112,7 @@ class ExtensionCommand extends BaseCommand
                                 $extensions[$ext->getExtensionName()] = $ext;
                                 $extensionNames[] = $extName;
                                 break;
-                            } catch (Exception $e) {
+                            } catch (Exception) {
                             }
                         }
 

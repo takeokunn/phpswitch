@@ -34,7 +34,7 @@ class DownloaderTest extends TestCase
      */
     public function testDownloadByWgetCommand()
     {
-        $this->assertDownloaderWorks('PhpSwitch\Downloader\WgetCommandDownloader');
+        $this->assertDownloaderWorks(\PhpSwitch\Downloader\WgetCommandDownloader::class);
     }
 
     /**
@@ -42,25 +42,25 @@ class DownloaderTest extends TestCase
      */
     public function testDownloadByCurlCommand()
     {
-        $this->assertDownloaderWorks('PhpSwitch\Downloader\CurlCommandDownloader');
+        $this->assertDownloaderWorks(\PhpSwitch\Downloader\CurlCommandDownloader::class);
     }
 
     public function testDownloadByCurlExtension()
     {
-        $this->assertDownloaderWorks('PhpSwitch\Downloader\PhpCurlDownloader');
+        $this->assertDownloaderWorks(\PhpSwitch\Downloader\PhpCurlDownloader::class);
     }
 
     public function testDownloadByFileFunction()
     {
-        $this->assertDownloaderWorks('PhpSwitch\Downloader\PhpStreamDownloader');
+        $this->assertDownloaderWorks(\PhpSwitch\Downloader\PhpStreamDownloader::class);
     }
 
     private function assertDownloaderWorks($downloader)
     {
-        $instance = DownloadFactory::getInstance($this->logger, new OptionResult(), $downloader);
-        if ($instance->hasSupport(false)) {
+        $baseDownloader = DownloadFactory::getInstance($this->logger, new OptionResult(), $downloader);
+        if ($baseDownloader->hasSupport(false)) {
             $actualFilePath = tempnam(Config::getTempFileDir(), '');
-            $instance->download('http://httpbin.org/', $actualFilePath);
+            $baseDownloader->download('http://httpbin.org/', $actualFilePath);
             $this->assertFileExists($actualFilePath);
         } else {
             $this->markTestSkipped();

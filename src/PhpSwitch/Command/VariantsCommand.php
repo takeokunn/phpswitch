@@ -22,7 +22,7 @@ class VariantsCommand extends Command
         $lineX = 0;
         $newLine = $prefix;
 
-        for ($i = 0; $i < strlen($line); $i++ && $lineX++) {
+        for ($i = 0; $i < strlen((string) $line); $i++ && $lineX++) {
             $c = $line[$i];
             $newLine .= $c;
 
@@ -37,8 +37,8 @@ class VariantsCommand extends Command
 
     public function execute($version = null)
     {
-        $variants = new VariantBuilder();
-        $list = $variants->getVariantNames();
+        $variantBuilder = new VariantBuilder();
+        $list = $variantBuilder->getVariantNames();
         sort($list);
 
         echo "Variants: " . PHP_EOL;
@@ -47,7 +47,7 @@ class VariantsCommand extends Command
 
         echo "Virtual variants: ", PHP_EOL;
 
-        foreach ($variants->virtualVariants as $name => $subvars) {
+        foreach ($variantBuilder->virtualVariants as $name => $subvars) {
             echo $this->wrapLine("$name: " . implode(', ', $subvars)) , PHP_EOL;
         }
 

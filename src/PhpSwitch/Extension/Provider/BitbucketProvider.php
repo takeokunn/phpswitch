@@ -64,8 +64,8 @@ class BitbucketProvider implements Provider
 
     public function exists($dsl, $packageName = null)
     {
-        $dslparser = new RepositoryDslParser();
-        $info = $dslparser->parse($dsl);
+        $repositoryDslParser = new RepositoryDslParser();
+        $info = $repositoryDslParser->parse($dsl);
 
         $this->setOwner($info['owner']);
         $this->setRepository($info['package']);
@@ -83,14 +83,14 @@ class BitbucketProvider implements Provider
     {
         return sprintf(
             'https://bitbucket.org/api/2.0/repositories/%s/%s/refs/tags',
-            rawurlencode($this->getOwner()),
-            rawurlencode($this->getRepository())
+            rawurlencode((string) $this->getOwner()),
+            rawurlencode((string) $this->getRepository())
         );
     }
 
     public function parseKnownReleasesResponse($content)
     {
-        $info = json_decode($content, true);
+        $info = json_decode((string) $content, true, 512, JSON_THROW_ON_ERROR);
         $versionList = array_keys($info);
 
         return $versionList;
@@ -118,9 +118,7 @@ class BitbucketProvider implements Provider
 
     public function extractPackageCommands($currentPhpExtensionDirectory, $targetFilePath)
     {
-        $cmds = array(
-            "tar -C $currentPhpExtensionDirectory -xzf $targetFilePath",
-        );
+        $cmds = ["tar -C $currentPhpExtensionDirectory -xzf $targetFilePath"];
 
         return $cmds;
     }
@@ -135,10 +133,7 @@ class BitbucketProvider implements Provider
             . $this->getRepository()
             . '-*';
 
-        $cmds = array(
-            "rm -rf $targetPkgDir",
-            "mv $extractDir $targetPkgDir",
-        );
+        $cmds = ["rm -rf $targetPkgDir", "mv $extractDir $targetPkgDir"];
 
         return $cmds;
     }

@@ -43,12 +43,12 @@ class SelfUpdateCommand extends Command
 
         //download to a tmp file first
         //the phar file is large so we prefer the commands rather than extensions.
-        $downloader = DownloadFactory::getInstance(
+        $baseDownloader = DownloadFactory::getInstance(
             $this->logger,
             $this->options,
-            array(DownloadFactory::METHOD_CURL, DownloadFactory::METHOD_WGET)
+            [DownloadFactory::METHOD_CURL, DownloadFactory::METHOD_WGET]
         );
-        $tempFile = $downloader->download($url);
+        $tempFile = $baseDownloader->download($url);
 
         if ($tempFile === false) {
             throw new RuntimeException('Update Failed', 1);

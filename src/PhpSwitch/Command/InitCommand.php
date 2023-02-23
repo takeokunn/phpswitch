@@ -36,7 +36,7 @@ class InitCommand extends Command
         $root = $this->options->root ?: Config::getRoot();
         $home = Config::getHome();
         $buildDir = Config::getBuildDir();
-        $buildPrefix = Config::getInstallPrefix();
+        $installPrefix = Config::getInstallPrefix();
         // $versionBuildPrefix = Config::getVersionInstallPrefix($version);
         // $versionBinPath     = Config::getVersionBinPath($version);
 
@@ -45,26 +45,23 @@ class InitCommand extends Command
             mkdir($root, 0755, true);
         }
 
-        $paths = array();
+        $paths = [];
         $paths[] = $home;
         $paths[] = $root;
         $paths[] = $buildDir;
-        $paths[] = $buildPrefix;
-        foreach ($paths as $p) {
-            $this->logger->debug("Checking directory $p");
-            if (!file_exists($p)) {
-                $this->logger->debug("Creating directory $p");
-                mkdir($p, 0755, true);
+        $paths[] = $installPrefix;
+        foreach ($paths as $path) {
+            $this->logger->debug("Checking directory {$path}");
+            if (!file_exists($path)) {
+                $this->logger->debug("Creating directory {$path}");
+                mkdir($path, 0755, true);
             } else {
-                $this->logger->debug("Directory $p is already created.");
+                $this->logger->debug("Directory {$path} is already created.");
             }
         }
 
         $this->logger->debug('Creating .metadata_never_index to prevent SpotLight indexing');
-        $indexFiles = array(
-            $root . DIRECTORY_SEPARATOR . '.metadata_never_index',
-            $home . DIRECTORY_SEPARATOR . '.metadata_never_index',
-        );
+        $indexFiles = [$root . DIRECTORY_SEPARATOR . '.metadata_never_index', $home . DIRECTORY_SEPARATOR . '.metadata_never_index'];
         foreach ($indexFiles as $indexFile) {
             if (!file_exists($indexFile)) {
                 touch($indexFile); // prevent spotlight index here
@@ -94,7 +91,7 @@ class InitCommand extends Command
         // write phpswitch.fish script to phpswitch home
         file_put_contents($home . '/phpswitch.fish', $this->getFishScriptPath());
 
-        if (strpos(getenv('SHELL'), 'fish') !== false) {
+        if (str_contains(getenv('SHELL'), 'fish')) {
             $initConfig = <<<EOS
 Paste the following line(s) to the end of your ~/.config/fish/config.fish and start a
 new shell, phpswitch should be up and fully functional from there:
@@ -148,7 +145,7 @@ EOS;
         if ($path) {
             $path = $path . DIRECTORY_SEPARATOR . 'shell';
         } else {
-            $path = dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'shell';
+            $path = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'shell';
         }
 
         return $path;

@@ -15,9 +15,7 @@ class SystemCommand extends Command
     public function arguments($args)
     {
         $args->add('php version')
-            ->suggestions(function () {
-                return BuildFinder::findInstalledBuilds();
-            });
+            ->suggestions(fn() => BuildFinder::findInstalledBuilds());
     }
 
     final public function execute()

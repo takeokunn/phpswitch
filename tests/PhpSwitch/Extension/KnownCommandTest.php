@@ -20,11 +20,11 @@ class KnownCommandTest extends CommandTestCase
         $logger = new Logger();
         $logger->setQuiet();
 
-        $provider = new PeclProvider($logger, new OptionResult());
-        $provider->setPackageName('xdebug');
+        $peclProvider = new PeclProvider($logger, new OptionResult());
+        $peclProvider->setPackageName('xdebug');
 
         $extensionDownloader = new ExtensionDownloader($logger, new OptionResult());
-        $versionList = $extensionDownloader->knownReleases($provider);
+        $versionList = $extensionDownloader->knownReleases($peclProvider);
 
         $this->assertNotCount(0, $versionList);
     }
@@ -38,16 +38,16 @@ class KnownCommandTest extends CommandTestCase
         $logger = new Logger();
         $logger->setQuiet();
 
-        $provider = new GithubProvider();
-        $provider->setOwner('phalcon');
-        $provider->setRepository('cphalcon');
-        $provider->setPackageName('phalcon');
+        $githubProvider = new GithubProvider();
+        $githubProvider->setOwner('phalcon');
+        $githubProvider->setRepository('cphalcon');
+        $githubProvider->setPackageName('phalcon');
         if (getenv('github_token')) { //load token from travis-ci
-            $provider->setAuth(getenv('github_token'));
+            $githubProvider->setAuth(getenv('github_token'));
         }
 
         $extensionDownloader = new ExtensionDownloader($logger, new OptionResult());
-        $versionList = $extensionDownloader->knownReleases($provider);
+        $versionList = $extensionDownloader->knownReleases($githubProvider);
         $this->assertNotCount(0, $versionList);
     }
 
@@ -57,13 +57,13 @@ class KnownCommandTest extends CommandTestCase
         $logger = new Logger();
         $logger->setQuiet();
 
-        $provider = new BitbucketProvider();
-        $provider->setOwner('osmanov');
-        $provider->setRepository('pecl-event');
-        $provider->setPackageName('event');
+        $bitbucketProvider = new BitbucketProvider();
+        $bitbucketProvider->setOwner('osmanov');
+        $bitbucketProvider->setRepository('pecl-event');
+        $bitbucketProvider->setPackageName('event');
 
         $extensionDownloader = new ExtensionDownloader($logger, new OptionResult());
-        $versionList = $extensionDownloader->knownReleases($provider);
+        $versionList = $extensionDownloader->knownReleases($bitbucketProvider);
 
         $this->assertNotCount(0, $versionList);
     }

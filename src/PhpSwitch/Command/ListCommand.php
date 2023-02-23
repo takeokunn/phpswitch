@@ -23,20 +23,20 @@ class ListCommand extends Command
     public function execute()
     {
         $builds = BuildFinder::findInstalledBuilds();
-        $currentBuild = Config::getCurrentPhpName();
+        $currentPhpName = Config::getCurrentPhpName();
 
         if (empty($builds)) {
             return $this->logger->notice('Please install at least one PHP with your preferred version.');
         }
 
-        if ($currentBuild === false or !in_array($currentBuild, $builds)) {
+        if ($currentPhpName === false or !in_array($currentPhpName, $builds)) {
             $this->logger->writeln('* (system)');
         }
 
         foreach ($builds as $build) {
             $versionPrefix = Config::getVersionInstallPrefix($build);
 
-            if ($currentBuild === $build) {
+            if ($currentPhpName === $build) {
                 $this->logger->writeln(
                     $this->formatter->format(sprintf('* %-15s', $build), 'bold')
                 );
@@ -54,7 +54,7 @@ class ListCommand extends Command
             if ($this->options->variants && file_exists($versionPrefix . DIRECTORY_SEPARATOR . 'phpbrew.variants')) {
                 $info = unserialize(file_get_contents($versionPrefix . DIRECTORY_SEPARATOR . 'phpbrew.variants'));
                 echo '    Variants: ';
-                echo wordwrap(VariantParser::revealCommandArguments($info), 75, " \\\n              ");
+                echo wordwrap((string) VariantParser::revealCommandArguments($info), 75, " \\\n              ");
                 echo PHP_EOL;
             }
         }

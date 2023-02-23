@@ -26,19 +26,15 @@ class PHP56WithOpenSSL11PatchTest extends PatchTestCase
         $build->enableVariant('openssl');
         $this->assertTrue($build->isEnabledVariant('openssl'));
 
-        $patch = new PHP56WithOpenSSL11Patch();
-        $this->assertTrue($patch->match($build, $logger));
+        $php56WithOpenSSL11Patch = new PHP56WithOpenSSL11Patch();
+        $this->assertTrue($php56WithOpenSSL11Patch->match($build, $logger));
 
-        $this->assertGreaterThan(0, $patch->apply($build, $logger));
+        $this->assertGreaterThan(0, $php56WithOpenSSL11Patch->apply($build, $logger));
 
         $expectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . '/' . $version . '-php56-openssl11-patch';
 
         foreach (
-            array(
-            'ext/openssl/openssl.c',
-            'ext/openssl/xp_ssl.c',
-            'ext/phar/util.c',
-                 ) as $path
+            ['ext/openssl/openssl.c', 'ext/openssl/xp_ssl.c', 'ext/phar/util.c'] as $path
         ) {
             $this->assertFileEquals(
                 $expectedDirectory . '/' .  $path,
@@ -49,8 +45,6 @@ class PHP56WithOpenSSL11PatchTest extends PatchTestCase
 
     public static function versionProvider()
     {
-        return array(
-            array('5.6.40'),
-        );
+        return [['5.6.40']];
     }
 }

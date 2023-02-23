@@ -11,7 +11,7 @@ use PhpSwitch\Exception\SystemCommandException;
  */
 class BuildTask extends BaseTask
 {
-    public function run(Build $build, $targets = array())
+    public function run(Build $build, $targets = [])
     {
         if ($build->getState() >= Build::STATE_BUILD) {
             $this->info('===> Already built, skipping...');
@@ -20,31 +20,31 @@ class BuildTask extends BaseTask
         }
 
         $this->info('===> Building...');
-        $cmd = new CommandBuilder('make');
+        $commandBuilder = new CommandBuilder('make');
 
-        $cmd->setAppendLog(true);
-        $cmd->setLogPath($build->getBuildLogPath());
-        $cmd->setStdout($this->options->{'stdout'});
+        $commandBuilder->setAppendLog(true);
+        $commandBuilder->setLogPath($build->getBuildLogPath());
+        $commandBuilder->setStdout($this->options->{'stdout'});
 
         if (!empty($targets)) {
-            foreach ($targets as $t) {
-                $cmd->addArg($t);
+            foreach ($targets as $target) {
+                $commandBuilder->addArg($target);
             }
         }
 
         if ($this->options->nice) {
-            $cmd->nice($this->options->nice);
+            $commandBuilder->nice($this->options->nice);
         }
 
         if ($makeJobs = $this->options->{'jobs'}) {
-            $cmd->addArg("-j{$makeJobs}");
+            $commandBuilder->addArg("-j{$makeJobs}");
         }
 
-        $this->debug($cmd->buildCommand());
+        $this->debug($commandBuilder->buildCommand());
 
         if (!$this->options->dryrun) {
             $startTime = microtime(true);
-            $code = $cmd->execute($lastline);
+            $code = $commandBuilder->execute($lastline);
             if ($code !== 0) {
                 throw new SystemCommandException("Make failed: $lastline", $build, $build->getBuildLogPath());
             }

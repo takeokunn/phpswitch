@@ -4,19 +4,10 @@ namespace PhpSwitch\Extension;
 
 class ConfigureOption
 {
-    public $option;
-
-    public $desc;
-
-    public $valueHint;
-
     public $defaultValue;
 
-    public function __construct($option, $desc, $valueHint = null)
+    public function __construct(public $option, public $desc, public $valueHint = null)
     {
-        $this->option = $option;
-        $this->desc = $desc;
-        $this->valueHint = $valueHint;
     }
 
     public function getOption()

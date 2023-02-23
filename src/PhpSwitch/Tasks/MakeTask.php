@@ -11,21 +11,21 @@ use PhpSwitch\Utils;
 class MakeTask extends BaseTask
 {
     private $buildLogPath;
-    private $isQuiet = false;
+    private bool $isQuiet = false;
 
-    public function run(Buildable $build)
+    public function run(Buildable $buildable)
     {
-        return $this->make($build->getSourceDirectory(), 'all', $build);
+        return $this->make($buildable->getSourceDirectory(), 'all', $buildable);
     }
 
-    public function install(Buildable $build)
+    public function install(Buildable $buildable)
     {
-        return $this->make($build->getSourceDirectory(), 'install', $build);
+        return $this->make($buildable->getSourceDirectory(), 'install', $buildable);
     }
 
-    public function clean(Buildable $build)
+    public function clean(Buildable $buildable)
     {
-        return $this->make($build->getSourceDirectory(), 'clean', $build);
+        return $this->make($buildable->getSourceDirectory(), 'clean', $buildable);
     }
 
     public function setBuildLogPath($buildLogPath)
@@ -73,7 +73,7 @@ class MakeTask extends BaseTask
         }
 
         // Prefer 'gmake' rather than 'make'
-        $cmd = array($gmake ?: $make, '-C', escapeshellarg($path));
+        $cmd = [$gmake ?: $make, '-C', escapeshellarg((string) $path)];
 
         if ($this->isQuiet()) {
             if ($gmake) {
@@ -87,9 +87,9 @@ class MakeTask extends BaseTask
             }
         }
 
-        $cmd[] = escapeshellarg($target);
+        $cmd[] = escapeshellarg((string) $target);
         if (!$this->logger->isDebug() && $this->buildLogPath) {
-            $cmd[] = ' >> ' . escapeshellarg($this->buildLogPath) . ' 2>&1';
+            $cmd[] = ' >> ' . escapeshellarg((string) $this->buildLogPath) . ' 2>&1';
         }
 
         $this->logger->info("===> Running make $target: " . implode(' ', $cmd));

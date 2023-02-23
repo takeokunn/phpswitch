@@ -12,8 +12,8 @@ use PhpSwitch\Exception\SystemCommandException;
 
 class Console extends Application
 {
-    const NAME = 'phpswitch';
-    const VERSION = '2.0.0';
+    final const NAME = 'phpswitch';
+    final const VERSION = '2.0.0';
 
     /**
      * @param OptionCollection $opts
@@ -51,14 +51,14 @@ class Console extends Application
 
         $this->command('fpm');
 
-        $this->command('list-ini', 'PhpSwitch\Command\ListIniCommand');
-        $this->command('self-update', 'PhpSwitch\Command\SelfUpdateCommand');
+        $this->command('list-ini', \PhpSwitch\Command\ListIniCommand::class);
+        $this->command('self-update', \PhpSwitch\Command\SelfUpdateCommand::class);
 
         $this->command('remove');
         $this->command('purge');
 
         $this->command('off');
-        $this->command('switch-off', 'PhpSwitch\Command\SwitchOffCommand');
+        $this->command('switch-off', \PhpSwitch\Command\SwitchOffCommand::class);
 
         $this->command('system');
         $this->command('system-off');

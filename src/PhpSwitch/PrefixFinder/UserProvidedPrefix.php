@@ -10,16 +10,10 @@ use PhpSwitch\PrefixFinder;
 final class UserProvidedPrefix implements PrefixFinder
 {
     /**
-     * @var string|null
-     */
-    private $prefix;
-
-    /**
      * @param string|null $prefix User-provided prefix
      */
-    public function __construct($prefix)
+    public function __construct(private readonly ?string $prefix)
     {
-        $this->prefix = $prefix;
     }
 
     /**

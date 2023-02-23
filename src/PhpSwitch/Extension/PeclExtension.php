@@ -8,22 +8,22 @@ class PeclExtension extends Extension
 {
     public $package;
 
-    public function setPackage(Package $pkg)
+    public function setPackage(Package $package)
     {
-        $this->package = $pkg;
-        $this->setVersion($pkg->getReleaseVersion());
+        $this->package = $package;
+        $this->setVersion($package->getReleaseVersion());
 
-        if ($pkg->getZendExtSrcRelease()) {
+        if ($package->getZendExtSrcRelease()) {
             $this->setZend(true);
         }
 
-        if ($n = strtolower($pkg->getProvidesExtension())) {
+        if ($n = strtolower((string) $package->getProvidesExtension())) {
             $this->setExtensionName($n);
             $this->setSharedLibraryName($n . '.so');
         }
 
-        if ($options = $pkg->getConfigureOptions()) {
-            $this->configureOptions = array();
+        if ($options = $package->getConfigureOptions()) {
+            $this->configureOptions = [];
             foreach ($options as $option) {
                 $this->addConfigureOption(new ConfigureOption('--' . $option->name, $option->prompt, $option->default));
             }
@@ -34,7 +34,7 @@ class PeclExtension extends Extension
     {
         if ($contents = $this->package->getContents()) {
             foreach ($contents as $content) {
-                if (preg_match('#config[0-9]*.m4$#', $content->file)) {
+                if (preg_match('#config[0-9]*.m4$#', (string) $content->file)) {
                     // TODO: make sure the file exists
                     return $content->file;
                 }

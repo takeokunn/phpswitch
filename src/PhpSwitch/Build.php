@@ -24,12 +24,12 @@ class Build implements Buildable
     /**
      * States that describe finished task.
      */
-    const STATE_NONE = 0;
-    const STATE_DOWNLOAD = 1;
-    const STATE_EXTRACT = 2;
-    const STATE_CONFIGURE = 3;
-    const STATE_BUILD = 4;
-    const STATE_INSTALL = 5;
+    final const STATE_NONE = 0;
+    final const STATE_DOWNLOAD = 1;
+    final const STATE_EXTRACT = 2;
+    final const STATE_CONFIGURE = 3;
+    final const STATE_BUILD = 4;
+    final const STATE_INSTALL = 5;
 
     public $name;
 
@@ -75,7 +75,7 @@ class Build implements Buildable
      */
     public function __construct($version, $name = null, $installPrefix = null)
     {
-        if (substr($version, 0, 4) === 'php-') {
+        if (str_starts_with($version, 'php-')) {
             $version = substr($version, 4);
         }
 
@@ -168,9 +168,9 @@ class Build implements Buildable
         return $this->installPrefix . DIRECTORY_SEPARATOR . $subpath;
     }
 
-    public function setBuildSettings(BuildSettings $settings)
+    public function setBuildSettings(BuildSettings $buildSettings)
     {
-        $this->settings = $settings;
+        $this->settings = $buildSettings;
         if (!$this->getInstallPrefix()) {
             return;
         }
@@ -247,6 +247,6 @@ class Build implements Buildable
 
     public function __call($m, $a)
     {
-        return call_user_func_array(array($this->settings, $m), $a);
+        return call_user_func_array([$this->settings, $m], $a);
     }
 }

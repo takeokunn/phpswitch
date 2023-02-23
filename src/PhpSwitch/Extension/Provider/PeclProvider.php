@@ -16,13 +16,8 @@ class PeclProvider implements Provider
     public $packageName = null;
     public $defaultVersion = 'stable';
 
-    private $logger;
-    private $options;
-
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(private readonly Logger $logger, private readonly OptionResult $optionResult)
     {
-        $this->logger = $logger;
-        $this->options = $options;
     }
 
     public static function getName()
@@ -39,15 +34,15 @@ class PeclProvider implements Provider
         }
 
         $channel = new PeclChannel($this->site);
-        $baseUrl = $channel->getRestBaseUrl();
-        $url = "$baseUrl/r/" . strtolower($packageName);
+        $restBaseUrl = $channel->getRestBaseUrl();
+        $url = "$restBaseUrl/r/" . strtolower((string) $packageName);
 
-        $downloader = DownloadFactory::getInstance($this->logger, $this->options);
+        $baseDownloader = DownloadFactory::getInstance($this->logger, $this->optionResult);
 
         // translate version name into numbers
-        if (in_array($version, array('stable', 'latest', 'beta'))) {
+        if (in_array($version, ['stable', 'latest', 'beta'])) {
             $stabilityTxtUrl = $url . '/' . $version . '.txt';
-            if ($ret = $downloader->request($stabilityTxtUrl)) {
+            if ($ret = $baseDownloader->request($stabilityTxtUrl)) {
                 $version = (string) $ret;
             } else {
                 throw new Exception("Can not translate stability {$version} into exact version name.");
@@ -55,7 +50,7 @@ class PeclProvider implements Provider
         }
 
         $xmlUrl = $url . '/' . $version . '.xml';
-        $ret = $downloader->request($xmlUrl);
+        $ret = $baseDownloader->request($xmlUrl);
 
         if ($ret === false) {
             throw new Exception('Unable to fetch package xml');
@@ -112,20 +107,7 @@ class PeclProvider implements Provider
 
     public function isBundled($name)
     {
-        return in_array(strtolower($name), array(
-            'bcmath', 'bz2', 'calendar', 'com_dotnet', 'ctype', 'curl', 'date',
-            'dba', 'dom', 'enchant', 'exif', 'fileinfo', 'filter', 'ftp', 'gd',
-            'gettext', 'gmp', 'hash', 'iconv', 'imap', 'interbase', 'intl',
-            'json', 'ldap', 'libxml', 'mbstring', 'mcrypt', 'mssql', 'mysqli',
-            'mysqlnd', 'oci8', 'odbc', 'opcache', 'openssl', 'pcntl', 'pcre',
-            'pdo', 'pdo_dblib', 'pdo_firebird', 'pdo_mysql', 'pdo_oci', 'pdo_odbc',
-            'pdo_pgsql', 'pdo_sqlite', 'pgsql', 'phar', 'posix', 'pspell',
-            'readline', 'recode', 'reflection', 'session', 'shmop', 'simplexml',
-            'skeleton', 'snmp', 'soap', 'sockets', 'spl', 'sqlite3', 'standard',
-            'sysvmsg', 'sysvsem', 'sysvshm', 'tidy', 'tokenizer', 'wddx', 'xml',
-            'xmlreader', 'xmlrpc', 'xmlwriter', 'xsl', 'zip', 'zlib', 'ext_skel',
-            'ext_skel_win32',
-        ));
+        return in_array(strtolower((string) $name), ['bcmath', 'bz2', 'calendar', 'com_dotnet', 'ctype', 'curl', 'date', 'dba', 'dom', 'enchant', 'exif', 'fileinfo', 'filter', 'ftp', 'gd', 'gettext', 'gmp', 'hash', 'iconv', 'imap', 'interbase', 'intl', 'json', 'ldap', 'libxml', 'mbstring', 'mcrypt', 'mssql', 'mysqli', 'mysqlnd', 'oci8', 'odbc', 'opcache', 'openssl', 'pcntl', 'pcre', 'pdo', 'pdo_dblib', 'pdo_firebird', 'pdo_mysql', 'pdo_oci', 'pdo_odbc', 'pdo_pgsql', 'pdo_sqlite', 'pgsql', 'phar', 'posix', 'pspell', 'readline', 'recode', 'reflection', 'session', 'shmop', 'simplexml', 'skeleton', 'snmp', 'soap', 'sockets', 'spl', 'sqlite3', 'standard', 'sysvmsg', 'sysvsem', 'sysvshm', 'tidy', 'tokenizer', 'wddx', 'xml', 'xmlreader', 'xmlrpc', 'xmlwriter', 'xsl', 'zip', 'zlib', 'ext_skel', 'ext_skel_win32']);
     }
 
     public function buildKnownReleasesUrl()
@@ -135,8 +117,8 @@ class PeclProvider implements Provider
 
     public function parseKnownReleasesResponse($content)
     {
-        $xml = simplexml_load_string($content);
-        $releases = array();
+        $xml = simplexml_load_string((string) $content);
+        $releases = [];
 
         foreach ($xml->r as $r) {
             $releases[] = (string) $r->v;
@@ -164,13 +146,13 @@ class PeclProvider implements Provider
     {
         $url = $this->buildPackageDownloadUrl($version);
         // Check if the url is for php source archive
-        if (preg_match('/php-.+\.tar\.(bz2|gz|xz)/', $url, $parts)) {
+        if (preg_match('/php-.+\.tar\.(bz2|gz|xz)/', (string) $url, $parts)) {
             return $parts[0];
         }
 
         // try to get the filename through parse_url
-        $path = parse_url($url, PHP_URL_PATH);
-        if (false === $path || false === strpos($path, '.')) {
+        $path = parse_url((string) $url, PHP_URL_PATH);
+        if (false === $path || !str_contains($path, '.')) {
             return;
         }
 
@@ -179,9 +161,7 @@ class PeclProvider implements Provider
 
     public function extractPackageCommands($currentPhpExtensionDirectory, $targetFilePath)
     {
-        $cmds = array(
-            "tar -C $currentPhpExtensionDirectory -xzf $targetFilePath",
-        );
+        $cmds = ["tar -C $currentPhpExtensionDirectory -xzf $targetFilePath"];
 
         return $cmds;
     }
@@ -189,16 +169,16 @@ class PeclProvider implements Provider
     public function postExtractPackageCommands($currentPhpExtensionDirectory, $targetFilePath)
     {
         $targetPkgDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $this->getPackageName();
-        $info = pathinfo($targetFilePath);
+        $info = pathinfo((string) $targetFilePath);
         $packageName = $this->getPackageName();
 
-        $cmds = array(
+        $cmds = [
             "rm -rf $targetPkgDir",
             // Move "memcached-2.2.7" to "memcached"
             "mv $currentPhpExtensionDirectory/{$info['filename']} $currentPhpExtensionDirectory/$packageName",
             // Move "ext/package.xml" to "memcached/package.xml"
             "mv $currentPhpExtensionDirectory/package.xml $currentPhpExtensionDirectory/$packageName/package.xml",
-        );
+        ];
 
         return $cmds;
     }

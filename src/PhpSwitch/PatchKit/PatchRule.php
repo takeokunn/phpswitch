@@ -7,7 +7,7 @@ use PhpSwitch\Buildable;
 
 interface PatchRule
 {
-    public function apply(Buildable $build, Logger $logger);
+    public function apply(Buildable $buildable, Logger $logger);
 
-    public function backup(Buildable $build, Logger $logger);
+    public function backup(Buildable $buildable, Logger $logger);
 }

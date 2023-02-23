@@ -85,8 +85,8 @@ class GithubProvider implements Provider
 
     public function exists($dsl, $packageName = null)
     {
-        $dslparser = new RepositoryDslParser();
-        $info = $dslparser->parse($dsl);
+        $repositoryDslParser = new RepositoryDslParser();
+        $info = $repositoryDslParser->parse($dsl);
 
         $this->setOwner($info['owner']);
         $this->setRepository($info['package']);
@@ -112,10 +112,8 @@ class GithubProvider implements Provider
 
     public function parseKnownReleasesResponse($content)
     {
-        $info = json_decode($content, true);
-        $versionList = array_map(function ($version) {
-            return $version['name'];
-        }, $info);
+        $info = json_decode((string) $content, true, 512, JSON_THROW_ON_ERROR);
+        $versionList = array_map(fn($version) => $version['name'], $info);
 
         return $versionList;
     }
@@ -142,9 +140,7 @@ class GithubProvider implements Provider
 
     public function extractPackageCommands($currentPhpExtensionDirectory, $targetFilePath)
     {
-        $cmds = array(
-            "tar -C $currentPhpExtensionDirectory -xzf $targetFilePath",
-        );
+        $cmds = ["tar -C $currentPhpExtensionDirectory -xzf $targetFilePath"];
 
         return $cmds;
     }
@@ -154,10 +150,7 @@ class GithubProvider implements Provider
         $targetPkgDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $this->getPackageName();
         $extractDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $this->getRepository() . '-*';
 
-        $cmds = array(
-            "rm -rf $targetPkgDir",
-            "mv $extractDir $targetPkgDir",
-        );
+        $cmds = ["rm -rf $targetPkgDir", "mv $extractDir $targetPkgDir"];
 
         return $cmds;
     }

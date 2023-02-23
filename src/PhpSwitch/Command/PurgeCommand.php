@@ -15,9 +15,7 @@ class PurgeCommand extends VirtualCommand
     public function arguments($args)
     {
         $args->add('PHP build')
-            ->validValues(function () {
-                return BuildFinder::findInstalledBuilds();
-            })
+            ->validValues(fn() => BuildFinder::findInstalledBuilds())
             ->multiple()
             ;
     }

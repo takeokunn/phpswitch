@@ -20,7 +20,7 @@ class VCRAdapter
 
     protected static function getVCRCassetteName($testInstance)
     {
-        $classname_parts = explode('\\', get_class($testInstance));
+        $classname_parts = explode('\\', (string) $testInstance::class);
 
         return join('/', array_slice($classname_parts, -2, 2));
     }

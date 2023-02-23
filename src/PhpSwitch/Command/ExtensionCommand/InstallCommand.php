@@ -43,9 +43,7 @@ class InstallCommand extends BaseCommand
 
                 return array_filter(
                     scandir($extdir),
-                    function ($d) use ($extdir) {
-                        return $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d);
-                    }
+                    fn($d) => $d != '.' && $d != '..' && is_dir($extdir . DIRECTORY_SEPARATOR . $d)
                 );
             });
     }
@@ -53,9 +51,9 @@ class InstallCommand extends BaseCommand
     protected function getExtConfig($args)
     {
         $version = null;
-        $options = array();
+        $options = [];
 
-        if (count($args) > 0) {
+        if ((is_countable($args) ? count($args) : 0) > 0) {
             $pos = array_search('--', $args);
             if ($pos !== false) {
                 $options = array_slice($args, $pos + 1);
@@ -66,10 +64,7 @@ class InstallCommand extends BaseCommand
             }
         }
 
-        return (object) array(
-            'version' => $version,
-            'options' => $options,
-        );
+        return (object) ['version' => $version, 'options' => $options];
     }
 
     public function prepare()
@@ -95,16 +90,16 @@ class InstallCommand extends BaseCommand
 
     public function execute($extName, $version = 'stable')
     {
-        if (strtolower($extName) === 'apc' && version_compare(PHP_VERSION, '5.6.0') > 0) {
+        if (strtolower((string) $extName) === 'apc' && version_compare(PHP_VERSION, '5.6.0') > 0) {
             $this->logger->warn('apc is not compatible with php 5.6+ versions, install apcu instead.');
         }
 
         // Detect protocol
         if (
-            (preg_match('#^git://#', $extName) || preg_match('#\.git$#', $extName))
-            && !preg_match('#github|bitbucket#', $extName)
+            (preg_match('#^git://#', (string) $extName) || preg_match('#\.git$#', (string) $extName))
+            && !preg_match('#github|bitbucket#', (string) $extName)
         ) {
-            $pathinfo = pathinfo($extName);
+            $pathinfo = pathinfo((string) $extName);
             $repoUrl = $extName;
             $extName = $pathinfo['filename'];
             $extDir = Config::getBuildDir()
@@ -126,13 +121,13 @@ class InstallCommand extends BaseCommand
         }
 
         // Expand extensionset from config
-        $extensions = array();
-        if (substr($extName, 0, 1) === '+') {
+        $extensions = [];
+        if (str_starts_with((string) $extName, '+')) {
             $config = Config::getConfigParam('extensions');
-            $extName = ltrim($extName, '+');
+            $extName = ltrim((string) $extName, '+');
             if (isset($config[$extName])) {
                 foreach ($config[$extName] as $extensionName => $extOptions) {
-                    $args = explode(' ', $extOptions);
+                    $args = explode(' ', (string) $extOptions);
                     $extensions[$extensionName] = $this->getExtConfig($args);
                 }
             } else {
@@ -145,7 +140,7 @@ class InstallCommand extends BaseCommand
 
         $extensionList = new ExtensionList($this->logger, $this->options);
 
-        $manager = new ExtensionManager($this->logger);
+        $extensionManager = new ExtensionManager($this->logger);
         foreach ($extensions as $extensionName => $extConfig) {
             $provider = $extensionList->exists($extensionName);
 
@@ -183,7 +178,7 @@ class InstallCommand extends BaseCommand
             if (!$ext) {
                 throw new Exception("$extensionName not found.");
             }
-            $manager->installExtension($ext, $extConfig->options);
+            $extensionManager->installExtension($ext, $extConfig->options);
         }
     }
 }

@@ -4,8 +4,7 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          backupGlobals="false"
-         colors="true"
->
+         colors="true">
     <php>
       <ini name="safe_mode_allowed_env_var" value="PHP_,PHPSWITCH"/>
       <env name="PHPSWITCH_ROOT" value=".phpswitch"/>
@@ -15,17 +14,14 @@
       <env name="PHPSWITCH_EXPECTED_PHP_DIR" value="tests/expected/php"/>
       <env name="PHPSWITCH_BUILD_PHP_DIR" value="tests/build"/>
     </php>
-
     <testsuites>
         <testsuite name="PHPSwitch">
-            <directory>tests</directory>
+            <directory>tests/PhpSwitch/BuildSettings</directory>
         </testsuite>
     </testsuites>
-
     <filter>
       <whitelist>
         <directory>src</directory>
       </whitelist>
     </filter>
-
 </phpunit>

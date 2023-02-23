@@ -28,9 +28,7 @@ class EnableCommand extends BaseCommand
             ->suggestions(function () {
                 $extension = '.ini.disabled';
 
-                return array_map(function ($path) use ($extension) {
-                    return basename($path, $extension);
-                }, glob(Config::getCurrentPhpDir() . "/var/db/*{$extension}"));
+                return array_map(fn($path) => basename($path, $extension), glob(Config::getCurrentPhpDir() . "/var/db/*{$extension}"));
             });
     }
 
@@ -40,7 +38,7 @@ class EnableCommand extends BaseCommand
         if ($this->options->sapi) {
             $sapi = $this->options->sapi;
         }
-        $manager = new ExtensionManager($this->logger);
-        $manager->enable($extensionName, $sapi);
+        $extensionManager = new ExtensionManager($this->logger);
+        $extensionManager->enable($extensionName, $sapi);
     }
 }

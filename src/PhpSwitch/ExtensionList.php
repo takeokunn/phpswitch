@@ -8,13 +8,8 @@ use PhpSwitch\Extension\Provider\Provider;
 
 class ExtensionList
 {
-    private $logger;
-    private $options;
-
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(private readonly Logger $logger, private readonly OptionResult $optionResult)
     {
-        $this->logger = $logger;
-        $this->options = $options;
     }
 
     /**
@@ -28,11 +23,7 @@ class ExtensionList
         if ($providers) {
             return $providers;
         }
-        $providers = array(
-            new Extension\Provider\GithubProvider(),
-            new Extension\Provider\BitbucketProvider(),
-            new Extension\Provider\PeclProvider($this->logger, $this->options),
-        );
+        $providers = [new Extension\Provider\GithubProvider(), new Extension\Provider\BitbucketProvider(), new Extension\Provider\PeclProvider($this->logger, $this->optionResult)];
 
         return $providers;
     }

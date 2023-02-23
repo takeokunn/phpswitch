@@ -14,7 +14,7 @@ use PhpSwitch\PatchKit\Patch;
  */
 class BeforeConfigureTask extends BaseTask
 {
-    public function run(Build $build, ConfigureParameters $parameters)
+    public function run(Build $build, ConfigureParameters $configureParameters)
     {
         if (!file_exists($build->getSourceDirectory() . DIRECTORY_SEPARATOR . 'configure')) {
             $this->debug("configure file not found, running './buildconf --force'...");
@@ -42,8 +42,8 @@ class BeforeConfigureTask extends BaseTask
 
         // let's apply patch for libphp{php version}.so (apxs)
         if ($build->isEnabledVariant('apxs2')) {
-            $apxs2Checker = new Apxs2CheckTask($this->logger);
-            $apxs2Checker->check($parameters);
+            $apxs2CheckTask = new Apxs2CheckTask($this->logger);
+            $apxs2CheckTask->check($configureParameters);
         }
 
         if (!$this->options->{'no-patch'}) {
@@ -54,11 +54,7 @@ class BeforeConfigureTask extends BaseTask
             $needBuildConf = false;
 
             /** @var Patch[] $patches */
-            $patches = array(
-                new Apache2ModuleNamePatch($build->getVersion()),
-                $freeTypePatch,
-                $readlinePatch
-            );
+            $patches = [new Apache2ModuleNamePatch($build->getVersion()), $freeTypePatch, $readlinePatch];
 
             foreach ($patches as $patch) {
                 $this->logger->info('Checking patch for ' . $patch->desc());

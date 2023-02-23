@@ -14,13 +14,13 @@ class PHP56WithOpenSSL11Patch extends Patch
         return 'php5.6 with openssl 1.1.x patch.';
     }
 
-    public function match(Buildable $build, Logger $logger)
+    public function match(Buildable $buildable, Logger $logger)
     {
-        $buildVersion = $build->getVersion();
+        $buildVersion = $buildable->getVersion();
 
-        return substr($buildVersion, 0, 4) === '5.6.'
+        return str_starts_with((string) $buildVersion, '5.6.')
             && version_compare($buildVersion, '5.6.31') >= 0 // patch only works for 5.6.31 and up
-            && $build->isEnabledVariant('openssl');
+            && $buildable->isEnabledVariant('openssl');
     }
 
     /**
@@ -32,9 +32,8 @@ class PHP56WithOpenSSL11Patch extends Patch
      */
     public function rules()
     {
-        return array(
-            DiffPatchRule::fromPatch(
-                <<<'EOP'
+        return [DiffPatchRule::fromPatch(
+            <<<'EOP'
 diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
 index a78a8fb10f82..6c3ae3cde80a 100644
 --- a/ext/openssl/openssl.c
@@ -1305,7 +1304,6 @@ index 6c3ae3cde80a..b53114cdf34d 100644
  static int X509_get_signature_nid(const X509 *x)
  {
 EOP
-            )->strip(1)
-        );
+        )->strip(1)];
     }
 }

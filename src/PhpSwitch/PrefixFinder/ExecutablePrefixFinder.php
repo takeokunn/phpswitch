@@ -11,16 +11,10 @@ use PhpSwitch\Utils;
 final class ExecutablePrefixFinder implements PrefixFinder
 {
     /**
-     * @var string
-     */
-    private $name;
-
-    /**
      * @param string $name Executable name
      */
-    public function __construct($name)
+    public function __construct(private $name)
     {
-        $this->name = $name;
     }
 
     /**

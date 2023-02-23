@@ -22,8 +22,8 @@ class UpdateCommand extends Command
 
     public function execute()
     {
-        $fetchTask = new FetchReleaseListTask($this->logger, $this->options);
-        $releases = $fetchTask->fetch();
+        $fetchReleaseListTask = new FetchReleaseListTask($this->logger, $this->options);
+        $releases = $fetchReleaseListTask->fetch();
 
         foreach ($releases as $majorVersion => $versions) {
             if (version_compare($majorVersion, '5.2', '<=')) {

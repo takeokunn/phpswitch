@@ -1,27 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\BuildSettings;
 
 use Exception;
 
-class BuildSettings
+final class BuildSettings
 {
     /**
-     * @var array<string,string|null>
+     * @var list<string>
      */
-    private $enabledVariants = array();
+    private array $enabledVariants = [];
 
     /**
-     * @var array<string,null>
-     */
-    private $disabledVariants = array();
+     * @var list<string>
+     * */
+    private array $disabledVariants = [];
 
     /**
-     * @var array<string>
+     * @var list<string>
      */
-    private $extraOptions = array();
+    private array $extraOptions = [];
 
-    public function __construct(array $settings = array())
+    /**
+     * @param array{
+     *     enabled_variants: list<string>|null,
+     *     disabled_variants: list<string>|null,
+     *     extra_options: list<string>|null
+     * }|array{} $settings
+     */
+    public function __construct(array $settings = [])
     {
         if (isset($settings['enabled_variants'])) {
             $this->enableVariants($settings['enabled_variants']);
@@ -30,20 +39,27 @@ class BuildSettings
             $this->disableVariants($settings['disabled_variants']);
         }
         if (isset($settings['extra_options'])) {
-            $this->extraOptions = array_merge($this->extraOptions, $settings['extra_options']);
+            $this->extraOptions = [...$this->extraOptions, ...$settings['extra_options']];
         }
     }
 
-    public function toArray()
+    /**
+     * @return array{
+     *     enabled_variants: list<string>,
+     *     disabled_variants: list<string>,
+     *     extra_options: list<string>
+     * }
+     */
+    public function toArray(): array
     {
-        return array(
+        return [
             'enabled_variants' => $this->enabledVariants,
             'disabled_variants' => $this->disabledVariants,
             'extra_options' => $this->extraOptions,
-        );
+        ];
     }
 
-    public function enableVariants(array $settings)
+    public function enableVariants(array $settings): void
     {
         foreach ($settings as $name => $value) {
             $this->enableVariant($name, $value);
@@ -96,7 +112,7 @@ class BuildSettings
     /**
      * Remove enabled variant.
      */
-    public function removeVariant($name)
+    public function removeVariant($name): void
     {
         unset($this->enabledVariants[$name]);
     }
@@ -139,11 +155,7 @@ class BuildSettings
 
     public function writeVariantInfoFile($variantInfoFile)
     {
-        return file_put_contents($variantInfoFile, serialize(array(
-            'enabled_variants' => $this->enabledVariants,
-            'disabled_variants' => $this->disabledVariants,
-            'extra_options' => array_unique($this->extraOptions),
-        )));
+        return file_put_contents($variantInfoFile, serialize(['enabled_variants' => $this->enabledVariants, 'disabled_variants' => $this->disabledVariants, 'extra_options' => array_unique($this->extraOptions)]));
     }
 
     public function loadVariantInfo(array $variantInfo)

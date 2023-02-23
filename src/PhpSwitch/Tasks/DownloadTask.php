@@ -16,8 +16,8 @@ class DownloadTask extends BaseTask
             throw new Exception("Directory is not writable: $dir");
         }
 
-        $downloader = DownloadFactory::getInstance($this->logger, $this->options);
-        $basename = $downloader->resolveDownloadFileName($url);
+        $baseDownloader = DownloadFactory::getInstance($this->logger, $this->options);
+        $basename = $baseDownloader->resolveDownloadFileName($url);
         if (!$basename) {
             throw new Exception("Can not parse url: $url");
         }
@@ -29,12 +29,12 @@ class DownloadTask extends BaseTask
             if ($hash && $hash2 != $hash) {
                 $this->logger->warn("Checksum mismatch: $hash2 != $hash");
                 $this->logger->info('Re-Downloading...');
-                $downloader->download($url, $targetFilePath);
+                $baseDownloader->download($url, $targetFilePath);
             } else {
                 $this->logger->info('Checksum matched: ' . $hash);
             }
         } else {
-            $downloader->download($url, $targetFilePath);
+            $baseDownloader->download($url, $targetFilePath);
         }
 
         return $targetFilePath;

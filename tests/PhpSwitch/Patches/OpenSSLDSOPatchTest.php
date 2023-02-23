@@ -31,10 +31,10 @@ class OpenSSLDSOPatchTest extends PatchTestCase
         $build->enableVariant('openssl');
         $this->assertTrue($build->isEnabledVariant('openssl'));
 
-        $patch = new OpenSSLDSOPatch();
-        $matched = $patch->match($build, $logger);
+        $openSSLDSOPatch = new OpenSSLDSOPatch();
+        $matched = $openSSLDSOPatch->match($build, $logger);
         $this->assertTrue($matched, 'patch matched');
-        $patchedCount = $patch->apply($build, $logger);
+        $patchedCount = $openSSLDSOPatch->apply($build, $logger);
         $this->assertEquals(10, $patchedCount);
     }
 }

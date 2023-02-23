@@ -7,14 +7,6 @@ use PhpSwitch\Config;
 
 class Extension implements Buildable
 {
-    /**
-     * @var string The extension package name
-     *
-     * The package name does not equal to the extension name.
-     * for example, "APCu" provides "apcu" instead of "APCu"
-     */
-    protected $name;
-
     protected $extensionName;
 
     protected $version;
@@ -38,16 +30,22 @@ class Extension implements Buildable
      *
      * Contains [($name, $desc), .... ] pairs
      */
-    protected $configureOptions = array();
+    protected $configureOptions = [];
 
-    protected static $nameMap = array(
-        'libsodium' => 'sodium',
-    );
+    protected static $nameMap = ['libsodium' => 'sodium'];
 
-    public function __construct($name)
+    /**
+     * @param string $name
+     */
+    public function __construct(/**
+     * @var string The extension package name
+     *
+     * The package name does not equal to the extension name.
+     * for example, "APCu" provides "apcu" instead of "APCu"
+     */
+    protected $name)
     {
-        $this->name = $name;
-        $this->extensionName = strtolower($name);
+        $this->extensionName = strtolower((string) $name);
     }
 
     public function setName($name)
@@ -91,7 +89,7 @@ class Extension implements Buildable
             return $this->sharedLibraryName;
         }
 
-        $name = strtolower($this->extensionName);
+        $name = strtolower((string) $this->extensionName);
         if (isset(self::$nameMap[$name])) {
             $name = self::$nameMap[$name];
         }
@@ -183,9 +181,9 @@ class Extension implements Buildable
         return extension_loaded($this->extensionName);
     }
 
-    public function addConfigureOption(ConfigureOption $opt)
+    public function addConfigureOption(ConfigureOption $configureOption)
     {
-        $this->configureOptions[] = $opt;
+        $this->configureOptions[] = $configureOption;
     }
 
     public function getConfigureOptions()

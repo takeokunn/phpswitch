@@ -12,11 +12,9 @@ class Utils
     public static function readTimeZone()
     {
         if (is_readable($tz = '/etc/timezone')) {
-            $lines = array_filter(file($tz), function ($line) {
-                return !preg_match('/^#/', $line);
-            });
+            $lines = array_filter(file($tz), fn($line) => !preg_match('/^#/', (string) $line));
             if (!empty($lines)) {
-                return trim($lines[0]);
+                return trim((string) $lines[0]);
             }
         }
 
@@ -27,11 +25,11 @@ class Utils
     {
         $int = '9223372036854775807';
         $int = intval($int);
-        if ($int == 9223372036854775807) {
+        if ($int == 9_223_372_036_854_775_807) {
             /* 64bit */
 
             return true;
-        } elseif ($int == 2147483647) {
+        } elseif ($int == 2_147_483_647) {
             /* 32bit */
 
             return false;
@@ -80,31 +78,35 @@ class Utils
             /opt/foo/lib/sparc-solaris/
             /opt/bar/include/sparc-solaris/
          */
-        $multiArchs = array(
+        $multiArchs = [
             'lib/lib64',
             'lib/lib32',
-            'lib64', // Linux Fedora
-            'lib', // CentOS
-            'lib/ia64-linux-gnu', // Linux IA-64
-            'lib/x86_64-linux-gnu', // Linux x86_64
-            'lib/x86_64-kfreebsd-gnu', // FreeBSD
+            'lib64',
+            // Linux Fedora
+            'lib',
+            // CentOS
+            'lib/ia64-linux-gnu',
+            // Linux IA-64
+            'lib/x86_64-linux-gnu',
+            // Linux x86_64
+            'lib/x86_64-kfreebsd-gnu',
+            // FreeBSD
             'lib/i386-linux-gnu',
-        );
+        ];
 
-        return array_filter($multiArchs, function ($archName) use ($prefix) {
-            return file_exists($prefix . '/' . $archName);
-        });
+        return array_filter($multiArchs, fn($archName) => file_exists($prefix . '/' . $archName));
     }
 
     public static function getLookupPrefixes()
     {
-        $prefixes = array(
+        $prefixes = [
             '/usr',
             '/usr/local',
-            '/usr/local/opt', // homebrew link
+            '/usr/local/opt',
+            // homebrew link
             '/opt',
             '/opt/local',
-        );
+        ];
 
         if ($pathStr = getenv('PHPSWITCH_LOOKUP_PREFIX')) {
             $paths = explode(':', $pathStr);

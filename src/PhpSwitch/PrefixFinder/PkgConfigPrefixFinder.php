@@ -11,16 +11,10 @@ use PhpSwitch\Utils;
 final class PkgConfigPrefixFinder implements PrefixFinder
 {
     /**
-     * @var string
-     */
-    private $package;
-
-    /**
      * @param string $package
      */
-    public function __construct($package)
+    public function __construct(private $package)
     {
-        $this->package = $package;
     }
 
     /**

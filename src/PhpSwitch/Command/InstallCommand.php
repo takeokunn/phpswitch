@@ -38,7 +38,7 @@ class InstallCommand extends Command
 
     public function aliases()
     {
-        return array('i', 'ins');
+        return ['i', 'ins'];
     }
 
     public function usage()
@@ -52,35 +52,29 @@ class InstallCommand extends Command
             $releaseList = ReleaseList::getReadyInstance();
             $releases = $releaseList->getReleases();
 
-            $collection = new ValueCollection();
+            $valueCollection = new ValueCollection();
             foreach ($releases as $major => $versions) {
-                $collection->group($major, "PHP $major", array_keys($versions));
+                $valueCollection->group($major, "PHP $major", array_keys($versions));
             }
 
-            $collection->group('pseudo', 'pseudo', array('latest', 'next'));
+            $valueCollection->group('pseudo', 'pseudo', ['latest', 'next']);
 
-            return $collection;
+            return $valueCollection;
         });
         $args->add('variants')->multiple()->suggestions(function () {
-            $variants = new VariantBuilder();
-            $list = $variants->getVariantNames();
+            $variantBuilder = new VariantBuilder();
+            $list = $variantBuilder->getVariantNames();
             sort($list);
 
-            return array_map(function ($n) {
-                return '+' . $n;
-            }, $list);
+            return array_map(fn($n) => '+' . $n, $list);
         });
     }
 
     public function parseSemanticOptions(array &$args)
     {
-        $settings = array();
+        $settings = [];
 
-        $definitions = array(
-            'as' => '*',
-            'like' => '*',
-            'using' => '*+',
-        );
+        $definitions = ['as' => '*', 'like' => '*', 'using' => '*+'];
 
         // XXX: support 'using'
         foreach ($definitions as $k => $requirement) {
@@ -89,7 +83,7 @@ class InstallCommand extends Command
             if ($idx !== false) {
                 if ($requirement == '*') {
                     // Find the value next to the position
-                    list($key, $val) = array_splice($args, $idx, 2);
+                    [$key, $val] = array_splice($args, $idx, 2);
                     $settings[$key] = $val;
                 } elseif ($requirement == '*+') {
                     $values = array_splice($args, $idx, 2);
@@ -194,11 +188,11 @@ class InstallCommand extends Command
             sleep(3);
         }
         $distUrl = null;
-        $versionInfo = array();
+        $versionInfo = [];
         $releaseList = ReleaseList::getReadyInstance($this->options);
         $versionDslParser = new VersionDslParser();
-        $clean = new MakeTask($this->logger, $this->options);
-        $clean->setQuiet();
+        $makeTask = new MakeTask($this->logger, $this->options);
+        $makeTask->setQuiet();
 
         if ($root = $this->options->root) {
             Config::setPhpSwitchRoot($root);
@@ -207,12 +201,12 @@ class InstallCommand extends Command
             Config::setPhpSwitchHome($home);
         }
 
-        if ('latest' === strtolower($version)) {
+        if ('latest' === strtolower((string) $version)) {
             $version = $releaseList->getLatestVersion();
         }
 
         // this should point to master or the latest version branch yet to be released
-        if ('next' === strtolower($version)) {
+        if ('next' === strtolower((string) $version)) {
             $version = 'github.com/php/php-src:master';
         }
 
@@ -227,15 +221,15 @@ class InstallCommand extends Command
             );
         } else {
             // TODO ↓ clean later ↓ d.d.d versions should be part of the DSL too
-            $version = preg_replace('/^php-/', '', $version);
+            $version = preg_replace('/^php-/', '', (string) $version);
             $versionInfo = $releaseList->getVersion($version);
             if (!$versionInfo) {
                 throw new Exception("Version $version not found.");
             }
             $version = $versionInfo['version'];
 
-            $distUrlPolicy = new DistributionUrlPolicy();
-            $distUrl = $distUrlPolicy->buildUrl($version, $versionInfo['filename'], $versionInfo['museum']);
+            $distributionUrlPolicy = new DistributionUrlPolicy();
+            $distUrl = $distributionUrlPolicy->buildUrl($version, $versionInfo['filename'], $versionInfo['museum']);
         }
 
         // get options and variants for building php
@@ -244,12 +238,12 @@ class InstallCommand extends Command
         array_shift($args); // shift the version name
 
         $semanticOptions = $this->parseSemanticOptions($args);
-        $buildAs = isset($semanticOptions['as']) ? $semanticOptions['as'] : $this->options->name;
-        $buildLike = isset($semanticOptions['like']) ? $semanticOptions['like'] : $this->options->like;
+        $buildAs = $semanticOptions['as'] ?? $this->options->name;
+        $buildLike = $semanticOptions['like'] ?? $this->options->like;
 
         // convert patch to realpath
         if ($this->options->patch) {
-            $patchPaths = array();
+            $patchPaths = [];
             foreach ($this->options->patch as $patch) {
                 /* @var SplFileInfo $patch */
                 $patchPath = realpath($patch);
@@ -314,7 +308,7 @@ class InstallCommand extends Command
             $this->logger->notice("Please run 'phpswitch variants' for more information." . PHP_EOL);
         }
 
-        if (preg_match('/5\.3\./', $version)) {
+        if (preg_match('/5\.3\./', (string) $version)) {
             $this->logger->notice('PHP 5.3 requires +intl, enabled by default.');
             $build->enableVariant('intl');
         }
@@ -328,8 +322,8 @@ class InstallCommand extends Command
         $this->logger->info('===> Loading and resolving variants...');
         $build->loadVariantInfo($variantInfo);
 
-        $prepareTask = new PrepareDirectoryTask($this->logger, $this->options);
-        $prepareTask->run($build);
+        $prepareDirectoryTask = new PrepareDirectoryTask($this->logger, $this->options);
+        $prepareDirectoryTask->run($build);
 
         // Move to to build directory, because we are going to download distribution.
         $buildDir = $this->options->{'build-dir'} ?: Config::getBuildDir();
@@ -410,7 +404,7 @@ class InstallCommand extends Command
                 $this->logger->info(
                     "You can append --no-clean option after the install command if you don't want to rebuild."
                 );
-                $clean->clean($build);
+                $makeTask->clean($build);
             }
         }
 
@@ -423,36 +417,27 @@ class InstallCommand extends Command
             $this->logger->warn("Can't store variant info.");
         }
 
-        $targetPaths = array();
+        $targetPaths = [];
         if (!$this->options->{'no-configure'}) {
             $options = $parameters->getOptions();
             // https://gist.github.com/tvlooy/953a7c0658e70b573ab4
-            $sapis = array('cli' => array(
-                'enable' => array('--enable-cli'),
-                'disable' => array('--disable-cli')
-            ));
+            $sapis = ['cli' => ['enable' => ['--enable-cli'], 'disable' => ['--disable-cli']]];
 
             if ($build->isEnabledVariant('apxs2')) {
-                $sapis['apache2'] = array(
-                    'enable' => array('--with-apxs2'),
-                    'disable' => array(),
-                );
+                $sapis['apache2'] = ['enable' => ['--with-apxs2'], 'disable' => []];
             }
             if ($build->isEnabledVariant('fpm')) {
-                $sapis['fpm'] = array(
-                    'enable' => array('--enable-fpm', '--with-fpm-systemd'),
-                    'disable' => array(),
-                );
+                $sapis['fpm'] = ['enable' => ['--enable-fpm', '--with-fpm-systemd'], 'disable' => []];
             }
 
             foreach ($sapis as $sapi => $enableDisable) {
                 $this->logger->info('Running make clean to ensure everything will be rebuilt.');
-                $clean->clean($build);
+                $makeTask->clean($build);
 
-                $addedOptions = $removedOptions = array();
+                $addedOptions = $removedOptions = [];
 
                 foreach ($sapis as $sapiName => $sapiEnableDisable) {
-                    list($addedOptions, $removedOptions) = $this->enableDisable(
+                    [$addedOptions, $removedOptions] = $this->enableDisable(
                         $parameters,
                         $sapiEnableDisable,
                         $sapiName === $sapi,
@@ -495,7 +480,7 @@ class InstallCommand extends Command
                 }
 
                 if ($this->options->{'post-clean'}) {
-                    $clean->clean($build);
+                    $makeTask->clean($build);
                 }
 
                 /* POST INSTALLATION **/
@@ -513,7 +498,7 @@ class InstallCommand extends Command
                     $this->installAs("$etcDirectory/php-fpm.conf.default", "$etcDirectory/php-fpm.conf");
                     $this->installAs("$etcDirectory/php-fpm.d/www.conf.default", "$etcDirectory/php-fpm.d/www.conf");
 
-                    $patchingFiles = array("$etcDirectory/php-fpm.d/www.conf", "$etcDirectory/php-fpm.conf");
+                    $patchingFiles = ["$etcDirectory/php-fpm.d/www.conf", "$etcDirectory/php-fpm.conf"];
                     foreach ($patchingFiles as $patchingFile) {
                         if (file_exists($patchingFile)) {
                             $this->logger->info("---> Found $patchingFile");
@@ -640,7 +625,6 @@ EOT;
     }
 
     /**
-     * @param Build $build
      * @param string $etcDirectory
      * @param string $phpConfigPath
      * @param string $sapi
@@ -710,14 +694,14 @@ EOT;
         return $targetConfigPath;
     }
 
-    private function build(Build $build, ConfigureParameters $parameters)
+    private function build(Build $build, ConfigureParameters $configureParameters)
     {
         $configureTask = new BeforeConfigureTask($this->logger, $this->options);
-        $configureTask->run($build, $parameters);
+        $configureTask->run($build, $configureParameters);
         unset($configureTask); // trigger __destruct
 
         $configureTask = new ConfigureTask($this->logger, $this->options);
-        $configureTask->run($build, $parameters);
+        $configureTask->run($build, $configureParameters);
         unset($configureTask); // trigger __destruct
 
         $configureTask = new AfterConfigureTask($this->logger, $this->options);
@@ -735,24 +719,24 @@ EOT;
      */
     private function enableDisable(&$parameters, $sapiSettings, $currentSapi, $defaults)
     {
-        $addedOptions = $removedOptions = array();
+        $addedOptions = $removedOptions = [];
 
         $enableOptions = $currentSapi ? $sapiSettings['enable'] : $sapiSettings['disable'];
         $disableOptions = $currentSapi ? $sapiSettings['disable'] : $sapiSettings['enable'];
 
-        foreach ($enableOptions as $configOption) {
-            $addedOptions[] = $configOption;
+        foreach ($enableOptions as $enableOption) {
+            $addedOptions[] = $enableOption;
             $parameters = $parameters->withOption(
-                $configOption,
-                array_key_exists($configOption, $defaults) ? $defaults[$configOption] : null
+                $enableOption,
+                array_key_exists($enableOption, $defaults) ? $defaults[$enableOption] : null
             );
         }
 
-        foreach ($disableOptions as $configOption) {
-            $removedOptions[] = $configOption;
-            $parameters = $parameters->withoutOption($configOption);
+        foreach ($disableOptions as $disableOption) {
+            $removedOptions[] = $disableOption;
+            $parameters = $parameters->withoutOption($disableOption);
         }
 
-        return array($addedOptions, $removedOptions);
+        return [$addedOptions, $removedOptions];
     }
 }

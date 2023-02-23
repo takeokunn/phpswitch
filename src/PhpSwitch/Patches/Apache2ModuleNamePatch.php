@@ -9,11 +9,8 @@ use PhpSwitch\PatchKit\RegExpPatchRule;
 
 class Apache2ModuleNamePatch extends Patch
 {
-    private $targetPhpVersion;
-
-    public function __construct($targetPhpVersion)
+    public function __construct(private $targetPhpVersion)
     {
-        $this->targetPhpVersion = $targetPhpVersion;
     }
 
     public function desc()
@@ -21,14 +18,14 @@ class Apache2ModuleNamePatch extends Patch
         return 'replace apache php module name with custom version name';
     }
 
-    public function match(Buildable $build, Logger $logger)
+    public function match(Buildable $buildable, Logger $logger)
     {
-        return $build->isEnabledVariant('apxs2');
+        return $buildable->isEnabledVariant('apxs2');
     }
 
     public function rules()
     {
-        $rules = array();
+        $rules = [];
 
         /*
         This is for replacing something like this:
@@ -44,7 +41,7 @@ class Apache2ModuleNamePatch extends Patch
         SAPI_SHARED=libs/libphp5.so
         */
         if (version_compare($this->targetPhpVersion, '8.0') < 0) {
-            $rules[] = RegExpPatchRule::files(array('configure'))
+            $rules[] = RegExpPatchRule::files(['configure'])
                 ->always()
                 ->replaces(
                     '#libphp\$PHP_MAJOR_VERSION\.#',
@@ -52,27 +49,27 @@ class Apache2ModuleNamePatch extends Patch
                 );
 
 
-            $rules[] = RegExpPatchRule::files(array('configure'))
+            $rules[] = RegExpPatchRule::files(['configure'])
                 ->always()
                 ->replaces(
                     '#libs/libphp[57].(so|la)#',
                     'libs/libphp\$PHP_VERSION.$1'
                 );
         } else {
-            $rules[] = RegExpPatchRule::files(array('configure'))
+            $rules[] = RegExpPatchRule::files(['configure'])
                 ->always()
                 ->replaces(
                     '#libphp.(a|so|la|bundle)#',
                     'libphp$PHP_VERSION.$1'
                 );
 
-            $rules[] = RegExpPatchRule::files(array('configure'))
+            $rules[] = RegExpPatchRule::files(['configure'])
                 ->always()
                 ->replaces(
                     '#libs/libphp.(a|so|la|bundle)#',
                     'libs/libphp\$PHP_VERSION.$1'
                 );
-            $rules[] = RegExpPatchRule::files(array('configure'))
+            $rules[] = RegExpPatchRule::files(['configure'])
                 ->always()
                 ->replaces(
                     '#libs/libphp.\$SHLIB_DL_SUFFIX_NAME#',
@@ -84,14 +81,14 @@ class Apache2ModuleNamePatch extends Patch
 
         if (version_compare($this->targetPhpVersion, '8.0') >= 0) {
             $makefile = 'build/Makefile.global';
-            $rules[] = RegExpPatchRule::files(array($makefile))
+            $rules[] = RegExpPatchRule::files([$makefile])
                  ->always()
                  ->replaces(
                      '#libphp.(a|so|la|bundle)#',
                      'libphp$(PHP_VERSION).$1'
                  );
 
-            $rules[] = RegExpPatchRule::files(array($makefile))
+            $rules[] = RegExpPatchRule::files([$makefile])
                  ->always()
                  ->replaces(
                      '#libphp.\$\(SHLIB_DL_SUFFIX_NAME\)#',
@@ -103,7 +100,7 @@ class Apache2ModuleNamePatch extends Patch
             $makefile = 'build/Makefile.global';
         }
 
-        $rules[] = RegExpPatchRule::files(array($makefile))
+        $rules[] = RegExpPatchRule::files([$makefile])
             ->always()
             ->replaces(
                 '#libphp\$\(PHP_MAJOR_VERSION\)#',

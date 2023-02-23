@@ -17,9 +17,7 @@ class CtagsCommand extends Command
     public function arguments($args)
     {
         $args->add('PHP build')
-            ->validValues(function () {
-                return BuildFinder::findInstalledBuilds();
-            })
+            ->validValues(fn() => BuildFinder::findInstalledBuilds())
             ;
     }
 
@@ -51,22 +49,22 @@ EOF
         }
         $this->logger->info('Scanning ' . $sourceDir);
 
-        $cmd = new CommandBuilder('ctags');
-        $cmd->arg('-R');
-        $cmd->arg('-a');
-        $cmd->arg('-h');
-        $cmd->arg('.c.h.cpp');
+        $commandBuilder = new CommandBuilder('ctags');
+        $commandBuilder->arg('-R');
+        $commandBuilder->arg('-a');
+        $commandBuilder->arg('-h');
+        $commandBuilder->arg('.c.h.cpp');
 
-        $cmd->arg($sourceDir . DIRECTORY_SEPARATOR . 'main');
-        $cmd->arg($sourceDir . DIRECTORY_SEPARATOR . 'ext');
-        $cmd->arg($sourceDir . DIRECTORY_SEPARATOR . 'Zend');
+        $commandBuilder->arg($sourceDir . DIRECTORY_SEPARATOR . 'main');
+        $commandBuilder->arg($sourceDir . DIRECTORY_SEPARATOR . 'ext');
+        $commandBuilder->arg($sourceDir . DIRECTORY_SEPARATOR . 'Zend');
 
-        foreach ($args as $a) {
-            $cmd->arg($a);
+        foreach ($args as $arg) {
+            $commandBuilder->arg($arg);
         }
 
-        $this->logger->debug($cmd->__toString());
-        $cmd->execute();
+        $this->logger->debug($commandBuilder->__toString());
+        $commandBuilder->execute();
 
         $this->logger->info('Done');
     }

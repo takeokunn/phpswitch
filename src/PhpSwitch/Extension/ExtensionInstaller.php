@@ -14,34 +14,34 @@ class ExtensionInstaller
 
     public $options;
 
-    public function __construct(Logger $logger, OptionResult $options = null)
+    public function __construct(Logger $logger, OptionResult $optionResult = null)
     {
         $this->logger = $logger;
-        $this->options = $options ?: new OptionResult();
+        $this->options = $optionResult ?: new OptionResult();
     }
 
-    public function install(Extension $ext, array $configureOptions = array())
+    public function install(Extension $extension, array $configureOptions = [])
     {
-        $sourceDir = $ext->getSourceDirectory();
+        $path = $extension->getSourceDirectory();
         $pwd = getcwd();
-        $buildLogPath = $sourceDir . DIRECTORY_SEPARATOR . 'build.log';
+        $buildLogPath = $path . DIRECTORY_SEPARATOR . 'build.log';
         $make = new MakeTask($this->logger, $this->options);
 
         $make->setBuildLogPath($buildLogPath);
 
         $this->logger->info("Log stored at: $buildLogPath");
 
-        $this->logger->info("Changing directory to $sourceDir");
-        chdir($sourceDir);
+        $this->logger->info("Changing directory to $path");
+        chdir($path);
 
-        if (!$this->options->{'no-clean'} && $ext->isBuildable()) {
+        if (!$this->options->{'no-clean'} && $extension->isBuildable()) {
             $clean = new MakeTask($this->logger, $this->options);
             $clean->setQuiet();
-            $clean->clean($ext);
+            $clean->clean($extension);
         }
 
-        if ($ext->getConfigM4File() !== 'config.m4' && !file_exists($sourceDir . DIRECTORY_SEPARATOR . 'config.m4')) {
-            symlink($ext->getConfigM4File(), $sourceDir . DIRECTORY_SEPARATOR . 'config.m4');
+        if ($extension->getConfigM4File() !== 'config.m4' && !file_exists($path . DIRECTORY_SEPARATOR . 'config.m4')) {
+            symlink($extension->getConfigM4File(), $path . DIRECTORY_SEPARATOR . 'config.m4');
         }
 
         // If the php version is specified, we should get phpize with the correct version.
@@ -69,7 +69,7 @@ class ExtensionInstaller
         if ($this->logger->isDebug()) {
             passthru('make');
         } else {
-            $make->run($ext);
+            $make->run($extension);
         }
 
         $this->logger->info('===> Installing...');
@@ -78,11 +78,11 @@ class ExtensionInstaller
         if ($this->logger->isDebug()) {
             passthru('make install');
         } else {
-            $make->install($ext);
+            $make->install($extension);
         }
 
         // TODO: use getSharedLibraryPath()
-        $this->logger->debug('Installed extension library: ' . $ext->getSharedLibraryPath());
+        $this->logger->debug('Installed extension library: ' . $extension->getSharedLibraryPath());
 
         // Try to find the installed path by pattern
         // Installing shared extensions: /Users/c9s/.phpswitch/php/php-5.4.10/lib/php/extensions/debug-non-zts-20100525/

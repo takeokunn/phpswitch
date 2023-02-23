@@ -14,11 +14,11 @@ class OpenSSLDSOPatch extends Patch
         return 'openssl dso linking patch';
     }
 
-    public function match(Buildable $build, Logger $logger)
+    public function match(Buildable $buildable, Logger $logger)
     {
-        return $build->osName === 'Darwin'
-            && version_compare($build->osRelease, '15.0.0') > 0
-            && $build->isEnabledVariant('openssl');
+        return $buildable->osName === 'Darwin'
+            && version_compare($buildable->osRelease, '15.0.0') > 0
+            && $buildable->isEnabledVariant('openssl');
     }
 
     public function rules()
@@ -35,9 +35,7 @@ class OpenSSLDSOPatch extends Patch
         $dylibssl = null;
         $dylibcrypto = null;
 
-        $paths = array('/opt/local/lib/libssl.dylib',
-            '/usr/local/opt/openssl/lib/libssl.dylib',
-            '/usr/local/lib/libssl.dylib', '/usr/lib/libssl.dylib', );
+        $paths = ['/opt/local/lib/libssl.dylib', '/usr/local/opt/openssl/lib/libssl.dylib', '/usr/local/lib/libssl.dylib', '/usr/lib/libssl.dylib'];
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 $dylibssl = $path;
@@ -45,9 +43,7 @@ class OpenSSLDSOPatch extends Patch
             }
         }
 
-        $paths = array('/opt/local/lib/libcrypto.dylib',
-            '/usr/local/opt/openssl/lib/libcrypto.dylib',
-            '/usr/local/lib/libcrypto.dylib', '/usr/lib/libcrypto.dylib', );
+        $paths = ['/opt/local/lib/libcrypto.dylib', '/usr/local/opt/openssl/lib/libcrypto.dylib', '/usr/local/lib/libcrypto.dylib', '/usr/lib/libcrypto.dylib'];
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 $dylibcrypto = $path;
@@ -55,15 +51,15 @@ class OpenSSLDSOPatch extends Patch
             }
         }
 
-        $rules = array();
+        $rules = [];
         if ($dylibssl) {
             $rules[] = RegExpPatchRule::files('Makefile')
-                ->allOf(array('/^EXTRA_LIBS =/'))
+                ->allOf(['/^EXTRA_LIBS =/'])
                 ->replaces('/-lssl/', $dylibssl);
         }
         if ($dylibcrypto) {
             $rules[] = RegExpPatchRule::files('Makefile')
-                ->allOf(array('/^EXTRA_LIBS =/'))
+                ->allOf(['/^EXTRA_LIBS =/'])
                 ->replaces('/-lcrypto/', $dylibcrypto);
         }
 

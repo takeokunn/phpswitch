@@ -1,13 +1,13 @@
 <?php
 
-namespace PhpSwith\Patches;
+namespace PhpSwitch\Patches;
 
 use CLIFramework\Logger;
 use PhpSwitch\Buildable;
 use PhpSwitch\PatchKit\Patch;
 use PhpSwitch\PatchKit\RegExpPatchRule;
 
-class IntlWith64bitPatch extends Patch
+class IntlWith64bitPatch extends \PhpSwitch\PatchKit\Patch
 {
     public function desc()
     {
@@ -50,20 +50,20 @@ class IntlWith64bitPatch extends Patch
      * - OS X 10.5
      * - OS X 10.6
      */
-    public function match(Buildable $build, Logger $logger)
+    public function match(\PhpSwitch\Buildable $buildable, \CLIFramework\Logger $logger)
     {
-        return $build->isEnabledVariant('intl') && version_compare($build->getVersion(), '5.4', '<=');
+        return $buildable->isEnabledVariant('intl') && \version_compare($buildable->getVersion(), '5.4', '<=');
     }
 
     public function rules()
     {
-        $rules = array();
-        $rules[] = RegExpPatchRule::files('Makefile')
-            ->allOf(array('/^BUILD_/'))
+        $rules = [];
+        $rules[] = \PhpSwitch\PatchKit\RegExpPatchRule::files('Makefile')
+            ->allOf(['/^BUILD_/'])
             ->replaces('/\$\(CC\)/', '$(CXX)');
 
-        $rules[] = RegExpPatchRule::files('Makefile')
-            ->allOf(array('/^EXTRA_LIBS =/'))
+        $rules[] = \PhpSwitch\PatchKit\RegExpPatchRule::files('Makefile')
+            ->allOf(['/^EXTRA_LIBS =/'])
             ->replaces('/^(.*)$/', '$1 -lstdc++');
 
         return $rules;

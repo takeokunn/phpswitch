@@ -31,10 +31,10 @@ class IntlWith64bitPatchTest extends PatchTestCase
         $build->enableVariant('intl');
         $this->assertTrue($build->isEnabledVariant('intl'));
 
-        $patch = new IntlWith64bitPatch();
-        $matched = $patch->match($build, $logger);
+        $intlWith64bitPatch = new IntlWith64bitPatch();
+        $matched = $intlWith64bitPatch->match($build, $logger);
         $this->assertTrue($matched, 'patch matched');
-        $patchedCount = $patch->apply($build, $logger);
+        $patchedCount = $intlWith64bitPatch->apply($build, $logger);
         $this->assertEquals(3, $patchedCount);
 
         $sourceExpectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . $fromVersion;

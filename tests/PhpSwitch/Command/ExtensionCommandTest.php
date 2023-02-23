@@ -12,17 +12,14 @@ class ExtensionCommandTest extends CommandTestCase
 {
     public function extensionNameProvider()
     {
-        return array(
-            array('APCu', 'latest'),
-            array('xdebug', 'latest'),
-        );
+        return [['APCu', 'latest'], ['xdebug', 'latest']];
     }
 
     /**
      * @outputBuffering enabled
      * @dataProvider extensionNameProvider
      */
-    public function testExtInstallCommand($extensionName, $extensionVersion)
+    public function testExtInstallCommand($extensionName, $extensionVersion): never
     {
         $this->markTestSkipped("This test can not be run against system php");
         $this->assertTrue($this->runCommandWithStdout("phpbrew ext install $extensionName $extensionVersion"));

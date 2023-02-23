@@ -12,10 +12,10 @@ abstract class BaseDownloader
 
     protected $options;
 
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(Logger $logger, OptionResult $optionResult)
     {
         $this->logger = $logger;
-        $this->options = $options;
+        $this->options = $optionResult;
     }
 
     /**
@@ -26,7 +26,7 @@ abstract class BaseDownloader
      *
      * @throws RuntimeException
      */
-    public function download($url, $targetFilePath = null)
+    public function download($url, $targetFilePath = null): bool|string
     {
         if (empty($targetFilePath)) {
             $targetFilePath = tempnam(sys_get_temp_dir(), 'phpswitch_');
@@ -59,7 +59,7 @@ abstract class BaseDownloader
      *
      * @throws RuntimeException
      */
-    public function request($url)
+    public function request($url): bool|string
     {
         $path = $this->download($url);
 
@@ -74,7 +74,7 @@ abstract class BaseDownloader
      * @return string|bool the resolved download file name or false it
      *                     the url string can't be parsed
      */
-    public function resolveDownloadFileName($url)
+    public function resolveDownloadFileName($url): string|bool
     {
         // Check if the url is for php source archive
         if (preg_match('/php-\d.+\.tar\.(bz2|gz|xz)/', $url, $parts)) {
@@ -83,7 +83,7 @@ abstract class BaseDownloader
 
         // try to get the filename through parse_url
         $path = parse_url($url, PHP_URL_PATH);
-        if (false === $path || false === strpos($path, '.')) {
+        if (false === $path || !str_contains($path, '.')) {
             return;
         }
 

@@ -30,7 +30,7 @@ function first_existing_executable($possiblePaths)
 
 function exec_line($command)
 {
-    $output = array();
+    $output = [];
     exec($command, $output, $retval);
     if ($retval === 0) {
         $output = array_filter($output);
@@ -51,89 +51,33 @@ class VariantBuilder
      *
      * @var array<string,string|array<string>|callable>
      */
-    private $variants = array();
+    private array $variants = [];
 
-    private $conflicts = array(
+    private array $conflicts = [
         // PHP Version lower than 5.4.0 can only built one SAPI at the same time.
-        'apxs2' => array('fpm', 'cgi'),
-        'editline' => array('readline'),
-        'readline' => array('editline'),
-
+        'apxs2' => ['fpm', 'cgi'],
+        'editline' => ['readline'],
+        'readline' => ['editline'],
         // dtrace is not compatible with phpdbg: https://github.com/krakjoe/phpdbg/issues/38
-        'dtrace' => array('phpdbg'),
-    );
+        'dtrace' => ['phpdbg'],
+    ];
 
     /**
      * @var array is for checking built variants
      *
      * contains ['-pdo','mysql','-sqlite','-debug']
      */
-    private $builtList = array();
+    private array $builtList = [];
 
-    public $virtualVariants = array(
-        'dbs' => array(
-            'sqlite',
-            'mysql',
-            'pgsql',
-            'pdo',
-        ),
-
-        'mb' => array(
-            'mbstring',
-            'mbregex',
-        ),
-
+    public $virtualVariants = [
+        'dbs' => ['sqlite', 'mysql', 'pgsql', 'pdo'],
+        'mb' => ['mbstring', 'mbregex'],
         // provide no additional feature
-        'neutral' => array(),
-
-        'small' => array(
-            'bz2',
-            'cli',
-            'dom',
-            'filter',
-            'ipc',
-            'json',
-            'mbregex',
-            'mbstring',
-            'pcre',
-            'phar',
-            'posix',
-            'readline',
-            'xml',
-            'curl',
-            'openssl',
-        ),
-
+        'neutral' => [],
+        'small' => ['bz2', 'cli', 'dom', 'filter', 'ipc', 'json', 'mbregex', 'mbstring', 'pcre', 'phar', 'posix', 'readline', 'xml', 'curl', 'openssl'],
         // provide all basic features
-        'default' => array(
-            'bcmath',
-            'bz2',
-            'calendar',
-            'cli',
-            'ctype',
-            'dom',
-            'fileinfo',
-            'filter',
-            'ipc',
-            'json',
-            'mbregex',
-            'mbstring',
-            'mhash',
-            'pcntl',
-            'pcre',
-            'pdo',
-            'pear',
-            'phar',
-            'posix',
-            'readline',
-            'sockets',
-            'tokenizer',
-            'xml',
-            'curl',
-            'openssl',
-            'zip',
-        ),
-    );
+        'default' => ['bcmath', 'bz2', 'calendar', 'cli', 'ctype', 'dom', 'fileinfo', 'filter', 'ipc', 'json', 'mbregex', 'mbstring', 'mhash', 'pcntl', 'pcre', 'pdo', 'pear', 'phar', 'posix', 'readline', 'sockets', 'tokenizer', 'xml', 'curl', 'openssl', 'zip'],
+    ];
 
     public function __construct()
     {
@@ -153,34 +97,30 @@ class VariantBuilder
         $this->variants['ftp'] = '--enable-ftp';
         $this->variants['filter'] = '--enable-filter';
         $this->variants['gcov'] = '--enable-gcov';
-        $this->variants['zts'] = function (ConfigureParameters $params, Build $build) {
+        $this->variants['zts'] = function (ConfigureParameters $configureParameters, Build $build) {
             if ($build->compareVersion('8.0') < 0) {
-                return $params->withOption('--enable-maintainer-zts');
+                return $configureParameters->withOption('--enable-maintainer-zts');
             }
 
-            return $params->withOption('--enable-zts');
+            return $configureParameters->withOption('--enable-zts');
         };
 
         $this->variants['json'] = '--enable-json';
         $this->variants['hash'] = '--enable-hash';
         $this->variants['exif'] = '--enable-exif';
 
-        $this->variants['mbstring'] = function (ConfigureParameters $params, Build $build, $value) {
-            $params = $params->withOption('--enable-mbstring');
+        $this->variants['mbstring'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $configureParameters = $configureParameters->withOption('--enable-mbstring');
 
             if ($build->compareVersion('7.4') >= 0 && !$build->isDisabledVariant('mbregex')) {
-                $prefix = Utils::findPrefix(array(
-                    new UserProvidedPrefix($value),
-                    new IncludePrefixFinder('oniguruma.h'),
-                    new BrewPrefixFinder('oniguruma'),
-                ));
+                $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('oniguruma.h'), new BrewPrefixFinder('oniguruma')]);
 
                 if ($prefix !== null) {
-                    $params = $params->withPkgConfigPath($prefix . '/lib/pkgconfig');
+                    $configureParameters = $configureParameters->withPkgConfigPath($prefix . '/lib/pkgconfig');
                 }
             }
 
-            return $params;
+            return $configureParameters;
         };
 
         $this->variants['mbregex'] = '--enable-mbregex';
@@ -193,12 +133,12 @@ class VariantBuilder
         $this->variants['debug'] = '--enable-debug';
         $this->variants['phpdbg'] = '--enable-phpdbg';
 
-        $this->variants['zip'] = function (ConfigureParameters $params, Build $build) {
+        $this->variants['zip'] = function (ConfigureParameters $configureParameters, Build $build) {
             if ($build->compareVersion('7.4') < 0) {
-                return $params->withOption('--enable-zip');
+                return $configureParameters->withOption('--enable-zip');
             }
 
-            return $params->withOption('--with-zip');
+            return $configureParameters->withOption('--with-zip');
         };
 
         $this->variants['bcmath'] = '--enable-bcmath';
@@ -215,118 +155,82 @@ class VariantBuilder
 
         $this->variants['opcache'] = '--enable-opcache';
 
-        $this->variants['imap'] = function (ConfigureParameters $params, Build $build, $value) {
-            $imapPrefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('imap-uw'),
-            ));
+        $this->variants['imap'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $imapPrefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('imap-uw')]);
 
-            $kerberosPrefix = Utils::findPrefix(array(
-                new BrewPrefixFinder('krb5'),
-            ));
+            $kerberosPrefix = Utils::findPrefix([new BrewPrefixFinder('krb5')]);
 
-            $opensslPrefix = Utils::findPrefix(array(
-                new BrewPrefixFinder('openssl'),
-                new PkgConfigPrefixFinder('openssl'),
-                new IncludePrefixFinder('openssl/opensslv.h'),
-            ));
+            $opensslPrefix = Utils::findPrefix([new BrewPrefixFinder('openssl'), new PkgConfigPrefixFinder('openssl'), new IncludePrefixFinder('openssl/opensslv.h')]);
 
-            return $params->withOption('--with-imap', $imapPrefix)
+            return $configureParameters->withOption('--with-imap', $imapPrefix)
                 ->withOptionOrPkgConfigPath($build, '--with-kerberos', $kerberosPrefix)
                 ->withOptionOrPkgConfigPath($build, '--with-imap-ssl', $opensslPrefix);
         };
 
-        $this->variants['ldap'] = function (ConfigureParameters $params, Build $_, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('ldap.h'),
-                new BrewPrefixFinder('openldap'),
-            ));
+        $this->variants['ldap'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('ldap.h'), new BrewPrefixFinder('openldap')]);
 
             if ($prefix !== null) {
-                $params = $params->withOption('--with-ldap', $prefix);
+                $configureParameters = $configureParameters->withOption('--with-ldap', $prefix);
             }
 
-            return $params;
+            return $configureParameters;
         };
 
         $this->variants['tidy'] = '--with-tidy';
         $this->variants['kerberos'] = '--with-kerberos';
         $this->variants['xmlrpc'] = '--with-xmlrpc';
 
-        $this->variants['fpm'] = function (ConfigureParameters $params) {
-            $params = $params->withOption('--enable-fpm');
+        $this->variants['fpm'] = function (ConfigureParameters $configureParameters) {
+            $configureParameters = $configureParameters->withOption('--enable-fpm');
 
             if ($bin = Utils::findBin('systemctl') && Utils::findIncludePrefix('systemd/sd-daemon.h')) {
-                $params = $params->withOption('--with-fpm-systemd');
+                $configureParameters = $configureParameters->withOption('--with-fpm-systemd');
             }
 
-            return $params;
+            return $configureParameters;
         };
 
-        $this->variants['dtrace'] = function (ConfigureParameters $params) {
-            return $params->withOption('--enable-dtrace');
-        };
+        $this->variants['dtrace'] = fn(ConfigureParameters $configureParameters) => $configureParameters->withOption('--enable-dtrace');
 
-        $this->variants['pcre'] = function (ConfigureParameters $params, Build $build, $value) {
+        $this->variants['pcre'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
             if ($build->compareVersion('7.4') >= 0) {
-                return $params;
+                return $configureParameters;
             }
 
-            $params = $params->withOption('--with-pcre-regex');
+            $configureParameters = $configureParameters->withOption('--with-pcre-regex');
 
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('pcre.h'),
-                new BrewPrefixFinder('pcre'),
-            ));
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('pcre.h'), new BrewPrefixFinder('pcre')]);
 
             if ($prefix !== null) {
-                $params = $params->withOption('--with-pcre-dir', $prefix);
+                $configureParameters = $configureParameters->withOption('--with-pcre-dir', $prefix);
             }
 
-            return $params;
+            return $configureParameters;
         };
 
-        $this->variants['mhash'] = function (ConfigureParameters $params, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('mhash.h'),
-                new BrewPrefixFinder('mhash'),
-            ));
+        $this->variants['mhash'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('mhash.h'), new BrewPrefixFinder('mhash')]);
 
-            return $params->withOption('--with-mhash', $prefix);
+            return $configureParameters->withOption('--with-mhash', $prefix);
         };
 
-        $this->variants['mcrypt'] = function (ConfigureParameters $params, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('mcrypt.h'),
-                new BrewPrefixFinder('mcrypt'),
-            ));
+        $this->variants['mcrypt'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('mcrypt.h'), new BrewPrefixFinder('mcrypt')]);
 
-            return $params->withOption('--with-mcrypt', $prefix);
+            return $configureParameters->withOption('--with-mcrypt', $prefix);
         };
 
-        $this->variants['zlib'] = function (ConfigureParameters $params, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('zlib'),
-                new IncludePrefixFinder('zlib.h'),
-            ));
+        $this->variants['zlib'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('zlib'), new IncludePrefixFinder('zlib.h')]);
 
-            return $params->withOptionOrPkgConfigPath($build, '--with-zlib', $prefix);
+            return $configureParameters->withOptionOrPkgConfigPath($build, '--with-zlib', $prefix);
         };
 
-        $this->variants['curl'] = function (ConfigureParameters $params, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('curl'),
-                new PkgConfigPrefixFinder('libcurl'),
-                new IncludePrefixFinder('curl/curl.h'),
-            ));
+        $this->variants['curl'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('curl'), new PkgConfigPrefixFinder('libcurl'), new IncludePrefixFinder('curl/curl.h')]);
 
-            return $params->withOptionOrPkgConfigPath($build, '--with-curl', $prefix);
+            return $configureParameters->withOptionOrPkgConfigPath($build, '--with-curl', $prefix);
         };
 
         /*
@@ -344,14 +248,10 @@ class VariantBuilder
         So we should prefer macports/homebrew library than the system readline library.
         @see https://bugs.php.net/bug.php?id=48608
         */
-        $this->variants['readline'] = function (ConfigureParameters $params, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('readline'),
-                new IncludePrefixFinder('readline/readline.h'),
-            ));
+        $this->variants['readline'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('readline'), new IncludePrefixFinder('readline/readline.h')]);
 
-            return $params->withOption('--with-readline', $prefix);
+            return $configureParameters->withOption('--with-readline', $prefix);
         };
 
         /*
@@ -361,14 +261,10 @@ class VariantBuilder
          *
          *      brew tap homebrew/dupes
          */
-        $this->variants['editline'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('editline/readline.h'),
-                new BrewPrefixFinder('libedit'),
-            ));
+        $this->variants['editline'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('editline/readline.h'), new BrewPrefixFinder('libedit')]);
 
-            return $parameters->withOption('--with-libedit', $prefix);
+            return $configureParameters->withOption('--with-libedit', $prefix);
         };
 
         /*
@@ -389,12 +285,8 @@ class VariantBuilder
          *
          * @see https://github.com/phpbrew/phpbrew/issues/461
          */
-        $this->variants['gd'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('gd.h'),
-                new BrewPrefixFinder('gd'),
-            ));
+        $this->variants['gd'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('gd.h'), new BrewPrefixFinder('gd')]);
 
             if ($build->compareVersion('7.4') < 0) {
                 $option = '--with-gd';
@@ -408,17 +300,14 @@ class VariantBuilder
                 $value .= ',' . $prefix;
             }
 
-            $parameters = $parameters->withOption($option, $value);
+            $configureParameters = $configureParameters->withOption($option, $value);
 
             if ($build->compareVersion('5.5') < 0) {
-                $parameters = $parameters->withOption('--enable-gd-native-ttf');
+                $configureParameters = $configureParameters->withOption('--enable-gd-native-ttf');
             }
 
             if (
-                ($prefix = Utils::findPrefix(array(
-                new IncludePrefixFinder('jpeglib.h'),
-                new BrewPrefixFinder('libjpeg'),
-                ))) !== null
+                ($prefix = Utils::findPrefix([new IncludePrefixFinder('jpeglib.h'), new BrewPrefixFinder('libjpeg')])) !== null
             ) {
                 if ($build->compareVersion('7.4') < 0) {
                     $option = '--with-jpeg-dir';
@@ -426,17 +315,13 @@ class VariantBuilder
                     $option = '--with-jpeg';
                 }
 
-                $parameters = $parameters->withOption($option, $prefix);
+                $configureParameters = $configureParameters->withOption($option, $prefix);
             }
 
             if (
-                $build->compareVersion('7.4') < 0 && ($prefix = Utils::findPrefix(array(
-                new IncludePrefixFinder('png.h'),
-                new IncludePrefixFinder('libpng12/pngconf.h'),
-                new BrewPrefixFinder('libpng'),
-                ))) !== null
+                $build->compareVersion('7.4') < 0 && ($prefix = Utils::findPrefix([new IncludePrefixFinder('png.h'), new IncludePrefixFinder('libpng12/pngconf.h'), new BrewPrefixFinder('libpng')])) !== null
             ) {
-                $parameters = $parameters->withOption('--with-png-dir', $prefix);
+                $configureParameters = $configureParameters->withOption('--with-png-dir', $prefix);
             }
 
             // the freetype-dir option does not take prefix as its value,
@@ -445,11 +330,7 @@ class VariantBuilder
             // from configure:
             //   for path in $i/include/freetype2/freetype/freetype.h
             if (
-                ($prefix = Utils::findPrefix(array(
-                new IncludePrefixFinder('freetype2/freetype.h'),
-                new IncludePrefixFinder('freetype2/freetype/freetype.h'),
-                new BrewPrefixFinder('freetype'),
-                ))) !== null
+                ($prefix = Utils::findPrefix([new IncludePrefixFinder('freetype2/freetype.h'), new IncludePrefixFinder('freetype2/freetype/freetype.h'), new BrewPrefixFinder('freetype')])) !== null
             ) {
                 if ($build->compareVersion('7.4') < 0) {
                     $option = '--with-freetype-dir';
@@ -457,10 +338,10 @@ class VariantBuilder
                     $option = '--with-freetype';
                 }
 
-                $parameters = $parameters->withOption($option, $prefix);
+                $configureParameters = $configureParameters->withOption($option, $prefix);
             }
 
-            return $parameters;
+            return $configureParameters;
         };
 
         /*
@@ -480,37 +361,28 @@ class VariantBuilder
 
          Issue: https://github.com/phpbrew/phpbrew/issues/433
         */
-        $this->variants['intl'] = function (ConfigureParameters $parameters, Build $build) {
-            $parameters = $parameters->withOption('--enable-intl');
+        $this->variants['intl'] = function (ConfigureParameters $configureParameters, Build $build) {
+            $configureParameters = $configureParameters->withOption('--enable-intl');
 
-            $prefix = Utils::findPrefix(array(
-                new PkgConfigPrefixFinder('icu-i18n'),
-                new BrewPrefixFinder('icu4c'),
-            ));
+            $prefix = Utils::findPrefix([new PkgConfigPrefixFinder('icu-i18n'), new BrewPrefixFinder('icu4c')]);
 
             if ($build->compareVersion('7.4') < 0) {
                 if ($prefix !== null) {
-                    $parameters = $parameters->withOption('--with-icu-dir', $prefix);
+                    $configureParameters = $configureParameters->withOption('--with-icu-dir', $prefix);
                 }
             } else {
                 if ($prefix !== null) {
-                    $parameters = $parameters->withPkgConfigPath($prefix . '/lib/pkgconfig');
+                    $configureParameters = $configureParameters->withPkgConfigPath($prefix . '/lib/pkgconfig');
                 }
             }
 
-            return $parameters;
+            return $configureParameters;
         };
 
-        $this->variants['sodium'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('libsodium'),
-                new PkgConfigPrefixFinder('libsodium'),
-                new IncludePrefixFinder('sodium.h'),
-                new LibPrefixFinder('libsodium.a'),
-            ));
+        $this->variants['sodium'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('libsodium'), new PkgConfigPrefixFinder('libsodium'), new IncludePrefixFinder('sodium.h'), new LibPrefixFinder('libsodium.a')]);
 
-            return $parameters->withOption('--with-sodium', $prefix);
+            return $configureParameters->withOption('--with-sodium', $prefix);
         };
 
         /*
@@ -521,15 +393,10 @@ class VariantBuilder
          *
          * On ubuntu you need to install libssl-dev
          */
-        $this->variants['openssl'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('openssl'),
-                new PkgConfigPrefixFinder('openssl'),
-                new IncludePrefixFinder('openssl/opensslv.h'),
-            ));
+        $this->variants['openssl'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('openssl'), new PkgConfigPrefixFinder('openssl'), new IncludePrefixFinder('openssl/opensslv.h')]);
 
-            return $parameters->withOptionOrPkgConfigPath($build, '--with-openssl', $prefix);
+            return $configureParameters->withOptionOrPkgConfigPath($build, '--with-openssl', $prefix);
         };
 
         /*
@@ -570,108 +437,99 @@ class VariantBuilder
 
         mysqlnd was added since php 5.3
         */
-        $this->variants['mysql'] = function (ConfigureParameters $parameters, Build $build, $value) {
+        $this->variants['mysql'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
             if ($value === null) {
                 $value = 'mysqlnd';
             }
 
             if ($build->compareVersion('7.0') < 0) {
-                $parameters = $parameters->withOption('--with-mysql', $value);
+                $configureParameters = $configureParameters->withOption('--with-mysql', $value);
             }
 
-            $parameters = $parameters->withOption('--with-mysqli', $value);
+            $configureParameters = $configureParameters->withOption('--with-mysqli', $value);
 
             if ($build->isEnabledVariant('pdo')) {
-                $parameters = $parameters->withOption('--with-pdo-mysql', $value);
+                $configureParameters = $configureParameters->withOption('--with-pdo-mysql', $value);
             }
 
             $foundSock = false;
             if ($bin = Utils::findBin('mysql_config')) {
                 if ($output = exec_line("$bin --socket")) {
                     $foundSock = true;
-                    $parameters = $parameters->withOption('--with-mysql-sock', $output);
+                    $configureParameters = $configureParameters->withOption('--with-mysql-sock', $output);
                 }
             }
 
             if (!$foundSock) {
-                $possiblePaths = array(
+                $possiblePaths = [
                     /* macports mysql ... */
                     '/opt/local/var/run/mysql57/mysqld.sock',
                     '/opt/local/var/run/mysql56/mysqld.sock',
                     '/opt/local/var/run/mysql55/mysqld.sock',
                     '/opt/local/var/run/mysql54/mysqld.sock',
-
-                    '/tmp/mysql.sock', /* homebrew mysql sock */
-                    '/var/run/mysqld/mysqld.sock', /* ubuntu */
+                    '/tmp/mysql.sock',
+                    /* homebrew mysql sock */
+                    '/var/run/mysqld/mysqld.sock',
+                    /* ubuntu */
                     '/var/mysql/mysql.sock',
-                );
+                ];
 
-                foreach ($possiblePaths as $path) {
-                    if (file_exists($path)) {
-                        $parameters = $parameters->withOption('--with-mysql-sock', $path);
+                foreach ($possiblePaths as $possiblePath) {
+                    if (file_exists($possiblePath)) {
+                        $configureParameters = $configureParameters->withOption('--with-mysql-sock', $possiblePath);
                         break;
                     }
                 }
             }
 
-            return $parameters;
+            return $configureParameters;
         };
 
-        $this->variants['sqlite'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $parameters = $parameters->withOption('--with-sqlite3', $value);
+        $this->variants['sqlite'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $configureParameters = $configureParameters->withOption('--with-sqlite3', $value);
 
             if ($build->isEnabledVariant('pdo')) {
-                $parameters = $parameters->withOption('--with-pdo-sqlite', $value);
+                $configureParameters = $configureParameters->withOption('--with-pdo-sqlite', $value);
             }
 
-            return $parameters;
+            return $configureParameters;
         };
 
         /**
          * The --with-pgsql=[DIR] and --with-pdo-pgsql=[DIR] requires [DIR]/bin/pg_config to be found.
          */
-        $this->variants['pgsql'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new ExecutablePrefixFinder('pg_config'),
-                new BrewPrefixFinder('libpq'),
-            ));
+        $this->variants['pgsql'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new ExecutablePrefixFinder('pg_config'), new BrewPrefixFinder('libpq')]);
 
-            $parameters = $parameters->withOption('--with-pgsql', $prefix);
+            $configureParameters = $configureParameters->withOption('--with-pgsql', $prefix);
 
             if ($build->isEnabledVariant('pdo')) {
-                $parameters = $parameters->withOption('--with-pdo-pgsql', $prefix);
+                $configureParameters = $configureParameters->withOption('--with-pdo-pgsql', $prefix);
             }
 
-            return $parameters;
+            return $configureParameters;
         };
 
-        $this->variants['xml'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $parameters = $parameters->withOption('--enable-dom');
+        $this->variants['xml'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $configureParameters = $configureParameters->withOption('--enable-dom');
 
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('libxml2'),
-                new PkgConfigPrefixFinder('libxml'),
-                new IncludePrefixFinder('libxml2/libxml/globals.h'),
-                new LibPrefixFinder('libxml2.a'),
-            ));
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('libxml2'), new PkgConfigPrefixFinder('libxml'), new IncludePrefixFinder('libxml2/libxml/globals.h'), new LibPrefixFinder('libxml2.a')]);
 
             if ($build->compareVersion('7.4') < 0) {
-                $parameters = $parameters->withOption('--enable-libxml');
+                $configureParameters = $configureParameters->withOption('--enable-libxml');
 
                 if ($prefix !== null) {
-                    $parameters = $parameters->withOption('--with-libxml-dir', $prefix);
+                    $configureParameters = $configureParameters->withOption('--with-libxml-dir', $prefix);
                 }
             } else {
-                $parameters = $parameters->withOption('--with-libxml');
+                $configureParameters = $configureParameters->withOption('--with-libxml');
 
                 if ($prefix !== null) {
-                    $parameters = $parameters->withPkgConfigPath($prefix . '/lib/pkgconfig');
+                    $configureParameters = $configureParameters->withPkgConfigPath($prefix . '/lib/pkgconfig');
                 }
             }
 
-            return $parameters
+            return $configureParameters
                 ->withOption('--enable-simplexml')
                 ->withOption('--enable-xml')
                 ->withOption('--enable-xmlreader')
@@ -679,97 +537,85 @@ class VariantBuilder
                 ->withOption('--with-xsl');
         };
 
-        $this->variants['apxs2'] = function (ConfigureParameters $parameters, Build $build, $value) {
+        $this->variants['apxs2'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
             if ($value) {
-                return $parameters->withOption('--with-apxs2', $value);
+                return $configureParameters->withOption('--with-apxs2', $value);
             }
 
             if ($bin = Utils::findBinByPrefix('apxs2')) {
-                return $parameters->withOption('--with-apxs2', $bin);
+                return $configureParameters->withOption('--with-apxs2', $bin);
             }
 
             if ($bin = Utils::findBinByPrefix('apxs')) {
-                return $parameters->withOption('--with-apxs2', $bin);
+                return $configureParameters->withOption('--with-apxs2', $bin);
             }
 
             /* Special paths for homebrew */
-            $possiblePaths = array(
+            $possiblePaths = [
                 // macports apxs path
                 '/usr/local/opt/httpd24/bin/apxs',
                 '/usr/local/opt/httpd23/bin/apxs',
                 '/usr/local/opt/httpd22/bin/apxs',
                 '/usr/local/opt/httpd21/bin/apxs',
-
-                '/usr/local/sbin/apxs', // homebrew apxs prefix
+                '/usr/local/sbin/apxs',
+                // homebrew apxs prefix
                 '/usr/local/bin/apxs',
-                '/usr/sbin/apxs', // it's possible to find apxs under this path (OS X)
-                '/usr/bin/apxs', // not sure if this one helps
-            );
+                '/usr/sbin/apxs',
+                // it's possible to find apxs under this path (OS X)
+                '/usr/bin/apxs',
+            ];
 
             $path = first_existing_executable($possiblePaths);
 
-            return $parameters->withOption('--with-apxs2', $path);
+            return $configureParameters->withOption('--with-apxs2', $path);
         };
 
-        $this->variants['gettext'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('libintl.h'),
-                new BrewPrefixFinder('gettext'),
-            ));
+        $this->variants['gettext'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('libintl.h'), new BrewPrefixFinder('gettext')]);
 
-            return $parameters->withOption('--with-gettext', $prefix);
+            return $configureParameters->withOption('--with-gettext', $prefix);
         };
 
-        $this->variants['iconv'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
+        $this->variants['iconv'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([
                 // PHP can't be compiled with --with-iconv=/usr because it uses giconv
                 // https://bugs.php.net/bug.php?id=48451
                 new UserProvidedPrefix($value),
                 new BrewPrefixFinder('libiconv'),
-            ));
+            ]);
 
-            return $parameters->withOption('--with-iconv', $prefix);
+            return $configureParameters->withOption('--with-iconv', $prefix);
         };
 
-        $this->variants['bz2'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new BrewPrefixFinder('bzip2'),
-                new IncludePrefixFinder('bzlib.h'),
-            ));
+        $this->variants['bz2'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new BrewPrefixFinder('bzip2'), new IncludePrefixFinder('bzlib.h')]);
 
-            return $parameters->withOption('--with-bz2', $prefix);
+            return $configureParameters->withOption('--with-bz2', $prefix);
         };
 
-        $this->variants['ipc'] = function (ConfigureParameters $parameters, Build $build) {
-            return $parameters
-                ->withOption('--enable-shmop')
-                ->withOption('--enable-sysvsem')
-                ->withOption('--enable-sysvshm')
-                ->withOption('--enable-sysvmsg');
+        $this->variants['ipc'] = fn(ConfigureParameters $configureParameters, Build $build) => $configureParameters
+            ->withOption('--enable-shmop')
+            ->withOption('--enable-sysvsem')
+            ->withOption('--enable-sysvshm')
+            ->withOption('--enable-sysvmsg');
+
+        $this->variants['gmp'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
+            $prefix = Utils::findPrefix([new UserProvidedPrefix($value), new IncludePrefixFinder('gmp.h')]);
+
+            return $configureParameters->withOption('--with-gmp', $prefix);
         };
 
-        $this->variants['gmp'] = function (ConfigureParameters $parameters, Build $build, $value) {
-            $prefix = Utils::findPrefix(array(
-                new UserProvidedPrefix($value),
-                new IncludePrefixFinder('gmp.h'),
-            ));
-
-            return $parameters->withOption('--with-gmp', $prefix);
-        };
-
-        $this->variants['pear'] = function (ConfigureParameters $parameters, Build $build, $value) {
+        $this->variants['pear'] = function (ConfigureParameters $configureParameters, Build $build, $value) {
             if ($value === null) {
                 $value = $build->getInstallPrefix() . '/lib/php/pear';
             }
 
-            return $parameters->withOption('--with-pear', $value);
+            return $configureParameters->withOption('--with-pear', $value);
         };
 
         // merge virtual variants with config file
         $customVirtualVariants = Config::getConfigParam('variants');
-        $customVirtualVariantsToAdd = array();
+        $customVirtualVariantsToAdd = [];
 
         if (!empty($customVirtualVariants)) {
             foreach ($customVirtualVariants as $key => $extension) {
@@ -785,14 +631,14 @@ class VariantBuilder
         // create +everything variant
         $this->virtualVariants['everything'] = array_diff(
             array_keys($this->variants),
-            array('apxs2', 'all') // <- except these ones
+            ['apxs2', 'all'] // <- except these ones
         );
     }
 
     private function getConflict(Build $build, $feature)
     {
         if (isset($this->conflicts[ $feature ])) {
-            $conflicts = array();
+            $conflicts = [];
 
             foreach ($this->conflicts[ $feature ] as $f) {
                 if ($build->isEnabledVariant($f)) {
@@ -810,13 +656,13 @@ class VariantBuilder
     {
         if ($build->isEnabledVariant('apxs2') && version_compare($build->getVersion(), '5.4.0') < 0) {
             if ($conflicts = $this->getConflict($build, 'apxs2')) {
-                $msgs = array();
+                $msgs = [];
                 $msgs[] = 'PHP Version lower than 5.4.0 can only build one SAPI at the same time.';
                 $msgs[] = '+apxs2 is in conflict with ' . implode(',', $conflicts);
 
-                foreach ($conflicts as $c) {
-                    $msgs[] = "Disabling $c";
-                    $build->disableVariant($c);
+                foreach ($conflicts as $conflict) {
+                    $msgs[] = "Disabling {$conflict}";
+                    $build->disableVariant($conflict);
                 }
 
                 echo implode(PHP_EOL, $msgs) . PHP_EOL;
@@ -841,7 +687,7 @@ class VariantBuilder
      *
      * @throws Exception
      */
-    private function buildEnabledVariant(Build $build, $variant, $value, ConfigureParameters $parameters)
+    private function buildEnabledVariant(Build $build, $variant, $value, ConfigureParameters $configureParameters)
     {
         if (!isset($this->variants[$variant])) {
             throw new Exception(sprintf('Variant "%s" is not defined', $variant));
@@ -849,17 +695,17 @@ class VariantBuilder
 
         // Skip if we've built it
         if (in_array($variant, $this->builtList)) {
-            return $parameters;
+            return $configureParameters;
         }
 
         // Skip if we've disabled it
         if (isset($this->disables[$variant])) {
-            return $parameters;
+            return $configureParameters;
         }
 
         $this->builtList[] = $variant;
 
-        return $this->buildVariantFromDefinition($build, $this->variants[$variant], $value, $parameters);
+        return $this->buildVariantFromDefinition($build, $this->variants[$variant], $value, $configureParameters);
     }
 
     /**
@@ -871,7 +717,7 @@ class VariantBuilder
      *
      * @throws Exception
      */
-    private function buildDisabledVariant(Build $build, $variant, ConfigureParameters $parameters)
+    private function buildDisabledVariant(Build $build, $variant, ConfigureParameters $configureParameters)
     {
         if (!isset($this->variants[$variant])) {
             throw new Exception(sprintf('Variant "%s" is not defined', $variant));
@@ -879,7 +725,7 @@ class VariantBuilder
 
         // Skip if we've built it
         if (in_array('-' . $variant, $this->builtList)) {
-            return $parameters;
+            return $configureParameters;
         }
 
         $this->builtList[] = '-' . $variant;
@@ -898,10 +744,10 @@ class VariantBuilder
             // convert --with-xxx to --without-xxx
             $option = preg_replace('/^--with-/', '--without-', $option);
 
-            $parameters = $parameters->withOption($option);
+            $configureParameters = $configureParameters->withOption($option);
         }
 
-        return $parameters;
+        return $configureParameters;
     }
 
     /**
@@ -914,25 +760,21 @@ class VariantBuilder
      *
      * @throws Exception
      */
-    private function buildVariantFromDefinition(Build $build, $definition, $value, ConfigureParameters $parameters)
+    private function buildVariantFromDefinition(Build $build, string|array|callable $definition, $value, ConfigureParameters $configureParameters)
     {
         if (is_string($definition)) {
-            $parameters = $parameters->withOption($definition);
+            $configureParameters = $configureParameters->withOption($definition);
         } elseif (is_array($definition)) {
             foreach ($definition as $option => $value) {
-                $parameters = $parameters->withOption($option, $value);
+                $configureParameters = $configureParameters->withOption($option, $value);
             }
         } elseif (is_callable($definition)) {
-            $parameters = call_user_func_array($definition, array(
-                $parameters,
-                $build,
-                $value,
-            ));
+            $configureParameters = call_user_func_array($definition, [$configureParameters, $build, $value]);
         } else {
             throw new OopsException();
         }
 
-        return $parameters;
+        return $configureParameters;
     }
 
     /**
@@ -944,7 +786,7 @@ class VariantBuilder
      *
      * @throws Exception
      */
-    public function build(Build $build, ConfigureParameters $parameters = null)
+    public function build(Build $build, ConfigureParameters $configureParameters = null)
     {
         $customVirtualVariants = Config::getConfigParam('variants');
         foreach (array_keys($build->getEnabledVariants()) as $variantName) {
@@ -957,17 +799,17 @@ class VariantBuilder
             }
         }
 
-        if ($parameters === null) {
-            $parameters = new ConfigureParameters();
+        if ($configureParameters === null) {
+            $configureParameters = new ConfigureParameters();
         }
 
         // reset builtList
-        $this->builtList = array();
+        $this->builtList = [];
 
         // reset built options
         if (!$build->isEnabledVariant('all') && !$build->isEnabledVariant('neutral')) {
             // build common options
-            $parameters = $parameters
+            $configureParameters = $configureParameters
                 ->withOption('--disable-all')
                 ->withOption('--enable-phar')
                 ->withOption('--enable-session')
@@ -975,18 +817,18 @@ class VariantBuilder
                 ->withOption('--enable-tokenizer');
 
             if ($build->compareVersion('7.4') < 0) {
-                $parameters = $parameters->withOption('--with-pcre-regex');
+                $configureParameters = $configureParameters->withOption('--with-pcre-regex');
             }
 
             if ($value = Utils::findIncludePrefix('zlib.h')) {
-                $parameters = $parameters->withOption('--with-zlib', $value);
+                $configureParameters = $configureParameters->withOption('--with-zlib', $value);
             }
         }
 
         if ($value = Utils::findLibPrefix('x86_64-linux-gnu')) {
-            $parameters = $parameters->withOption('--with-libdir', 'lib/x86_64-linux-gnu');
+            $configureParameters = $configureParameters->withOption('--with-libdir', 'lib/x86_64-linux-gnu');
         } elseif ($value = Utils::findLibPrefix('i386-linux-gnu')) {
-            $parameters = $parameters->withOption('--with-libdir', 'lib/i386-linux-gnu');
+            $configureParameters = $configureParameters->withOption('--with-libdir', 'lib/i386-linux-gnu');
         }
 
         if ($build->compareVersion('5.6') >= 0) {
@@ -996,11 +838,11 @@ class VariantBuilder
         // enable/expand virtual variants
         foreach ($this->virtualVariants as $name => $variantNames) {
             if ($build->isEnabledVariant($name)) {
-                foreach ($variantNames as $subVariantName) {
+                foreach ($variantNames as $variantName) {
                     // enable the sub-variant only if it's not already enabled
                     // in order to not override a non-default value with the default
-                    if (!$build->isEnabledVariant($subVariantName)) {
-                        $build->enableVariant($subVariantName);
+                    if (!$build->isEnabledVariant($variantName)) {
+                        $build->enableVariant($variantName);
                     }
                 }
 
@@ -1018,17 +860,17 @@ class VariantBuilder
         $this->checkConflicts($build);
 
         foreach ($build->getEnabledVariants() as $variant => $value) {
-            $parameters = $this->buildEnabledVariant($build, $variant, $value, $parameters);
+            $configureParameters = $this->buildEnabledVariant($build, $variant, $value, $configureParameters);
         }
 
         foreach ($build->getDisabledVariants() as $variant => $_) {
-            $parameters = $this->buildDisabledVariant($build, $variant, $parameters);
+            $configureParameters = $this->buildDisabledVariant($build, $variant, $configureParameters);
         }
 
         foreach ($build->getExtraOptions() as $option) {
-            $parameters = $parameters->withOption($option);
+            $configureParameters = $configureParameters->withOption($option);
         }
 
-        return $parameters;
+        return $configureParameters;
     }
 }

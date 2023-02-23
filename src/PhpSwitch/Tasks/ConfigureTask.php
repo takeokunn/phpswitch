@@ -13,13 +13,13 @@ use PhpSwitch\Exception\SystemCommandException;
  */
 class ConfigureTask extends BaseTask
 {
-    public function run(Build $build, ConfigureParameters $parameters)
+    public function run(Build $build, ConfigureParameters $configureParameters)
     {
         $this->debug('Enabled variants: [' . implode(', ', array_keys($build->getEnabledVariants())) . ']');
         $this->debug('Disabled variants: [' . implode(', ', array_keys($build->getDisabledVariants())) . ']');
 
-        $cmd = new CommandBuilder('./configure');
-        $cmd->args($this->renderOptions($parameters));
+        $commandBuilder = new CommandBuilder('./configure');
+        $commandBuilder->args($this->renderOptions($configureParameters));
 
         $buildLogPath = $build->getBuildLogPath();
         if (file_exists($buildLogPath)) {
@@ -29,9 +29,9 @@ class ConfigureTask extends BaseTask
         }
 
         $this->info("===> Configuring {$build->version}...");
-        $cmd->setAppendLog(true);
-        $cmd->setLogPath($buildLogPath);
-        $cmd->setStdout($this->options->{'stdout'});
+        $commandBuilder->setAppendLog(true);
+        $commandBuilder->setLogPath($buildLogPath);
+        $commandBuilder->setStdout($this->options->{'stdout'});
 
         if (!$this->options->{'stdout'}) {
             $this->logger->info(PHP_EOL);
@@ -39,14 +39,14 @@ class ConfigureTask extends BaseTask
             $this->logger->info('   $ tail -F ' . escapeshellarg($buildLogPath) . PHP_EOL . PHP_EOL);
         }
 
-        $this->debug($cmd->buildCommand());
+        $this->debug($commandBuilder->buildCommand());
 
         if ($this->options->nice) {
-            $cmd->nice($this->options->nice);
+            $commandBuilder->nice($this->options->nice);
         }
 
         if (!$this->options->dryrun) {
-            $code = $cmd->execute($lastline);
+            $code = $commandBuilder->execute($lastline);
             if ($code !== 0) {
                 throw new SystemCommandException("Configure failed: $lastline", $build, $buildLogPath);
             }
@@ -54,11 +54,11 @@ class ConfigureTask extends BaseTask
         $build->setState(Build::STATE_CONFIGURE);
     }
 
-    private function renderOptions(ConfigureParameters $parameters)
+    private function renderOptions(ConfigureParameters $configureParameters)
     {
-        $args = array();
+        $args = [];
 
-        foreach ($parameters->getOptions() as $option => $value) {
+        foreach ($configureParameters->getOptions() as $option => $value) {
             $arg = $option;
 
             if ($value !== null) {
@@ -68,7 +68,7 @@ class ConfigureTask extends BaseTask
             $args[] = $arg;
         }
 
-        $pkgConfigPaths = $parameters->getPkgConfigPaths();
+        $pkgConfigPaths = $configureParameters->getPkgConfigPaths();
 
         if (count($pkgConfigPaths) > 0) {
             $args[] = 'PKG_CONFIG_PATH=' . implode(PATH_SEPARATOR, $pkgConfigPaths);

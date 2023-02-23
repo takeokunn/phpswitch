@@ -29,9 +29,7 @@ class CleanCommand extends Command
     public function arguments($args)
     {
         $args->add('PHP build')
-            ->validValues(function () {
-                return BuildFinder::findInstalledBuilds();
-            })
+            ->validValues(fn() => BuildFinder::findInstalledBuilds())
             ;
     }
 
@@ -46,11 +44,11 @@ class CleanCommand extends Command
                 Utils::recursive_unlink($buildDir, $this->logger);
             }
         } else {
-            $make = new MakeTask($this->logger);
-            $make->setQuiet();
+            $makeTask = new MakeTask($this->logger);
+            $makeTask->setQuiet();
             $build = new Build($version);
             $build->setSourceDirectory($buildDir);
-            if ($make->clean($build)) {
+            if ($makeTask->clean($build)) {
                 $this->logger->info('Distribution is cleaned up. Woof! ');
             }
         }

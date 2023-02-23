@@ -19,21 +19,22 @@ class ExtensionManager
      *
      * @var array
      */
-    protected $conflicts = array(
-        'json' => array('jsonc'),   // enabling jsonc disables json
-        'jsonc' => array('json'),    // enabling json disables jsonc
-    );
+    protected $conflicts = [
+        'json' => ['jsonc'],
+        // enabling jsonc disables json
+        'jsonc' => ['json'],
+    ];
 
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
     }
 
-    public function purgeExtension(Extension $ext)
+    public function purgeExtension(Extension $extension)
     {
-        if ($sourceDir = $ext->getSourceDirectory()) {
+        if ($path = $extension->getSourceDirectory()) {
             $currentPhpExtensionDirectory = Config::getBuildDir() . '/' . Config::getCurrentPhpName() . '/ext';
-            $extName = $ext->getExtensionName();
+            $extName = $extension->getExtensionName();
             $extensionDir = $currentPhpExtensionDirectory . DIRECTORY_SEPARATOR . $extName;
             if (file_exists($extensionDir)) {
                 Utils::system("rm -rvf $extensionDir");
@@ -41,16 +42,16 @@ class ExtensionManager
         }
     }
 
-    public function cleanExtension(Extension $ext)
+    public function cleanExtension(Extension $extension)
     {
-        $make = new MakeTask($this->logger);
-        $make->setQuiet();
-        $code = !is_dir($sourceDir = $ext->getSourceDirectory()) ||
-                !$ext->isBuildable() ||
-                !$make->clean($ext);
+        $makeTask = new MakeTask($this->logger);
+        $makeTask->setQuiet();
+        $code = !is_dir($path = $extension->getSourceDirectory()) ||
+                !$extension->isBuildable() ||
+                !$makeTask->clean($extension);
 
         if ($code != 0) {
-            $this->logger->error("Could not clean extension: {$ext->getName()}.");
+            $this->logger->error("Could not clean extension: {$extension->getName()}.");
         }
 
         return $code == 0;
@@ -60,38 +61,38 @@ class ExtensionManager
      * Whenever you call this method, you shall have already downloaded the extension
      * And have set the source directory on the Extension object.
      */
-    public function installExtension(Extension $ext, array $options = array())
+    public function installExtension(Extension $extension, array $options = [])
     {
-        $this->disableExtension($ext);
+        $this->disableExtension($extension);
 
-        $sourceDir = $ext->getSourceDirectory();
-        $name = $ext->getName();
+        $path = $extension->getSourceDirectory();
+        $name = $extension->getName();
 
-        if (!file_exists($sourceDir)) {
-            throw new Exception("Source directory $sourceDir does not exist.");
+        if (!file_exists($path)) {
+            throw new Exception("Source directory $path does not exist.");
         }
 
         // Install local extension
-        $installer = new ExtensionInstaller($this->logger);
+        $extensionInstaller = new ExtensionInstaller($this->logger);
         $this->logger->info("===> Installing {$name} extension...");
-        $this->logger->debug("Extension path $sourceDir");
+        $this->logger->debug("Extension path $path");
         // $installer->runInstall($name, $sourceDir, $options);
-        $installer->install($ext, $options);
+        $extensionInstaller->install($extension, $options);
 
-        $this->createExtensionConfig($ext);
-        $this->enableExtension($ext);
+        $this->createExtensionConfig($extension);
+        $this->enableExtension($extension);
         $this->logger->info('Done.');
 
-        return $sourceDir;
+        return $path;
     }
 
-    public function createExtensionConfig(Extension $ext)
+    public function createExtensionConfig(Extension $extension)
     {
-        $ini = $ext->getConfigFilePath();
+        $ini = $extension->getConfigFilePath();
         $this->logger->info("===> Creating config file {$ini}");
 
-        if (!file_exists(dirname($ini))) {
-            if (!mkdir($concurrentDirectory = dirname($ini), 0755, true) && !is_dir($concurrentDirectory)) {
+        if (!file_exists(dirname((string) $ini))) {
+            if (!mkdir($concurrentDirectory = dirname((string) $ini), 0755, true) && !is_dir($concurrentDirectory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
         }
@@ -103,10 +104,10 @@ class ExtensionManager
         // @see https://github.com/php/php-src/commit/0def1ca59a
         $content = sprintf(
             '%s=%s' . PHP_EOL,
-            $ext->isZend() ? 'zend_extension' : 'extension',
-            $ext->isZend() && PHP_VERSION_ID < 50500
-                ? $ext->getSharedLibraryPath()
-                : $ext->getSharedLibraryName()
+            $extension->isZend() ? 'zend_extension' : 'extension',
+            $extension->isZend() && PHP_VERSION_ID < 50500
+                ? $extension->getSharedLibraryPath()
+                : $extension->getSharedLibraryName()
         );
 
         // create extension config file
@@ -150,30 +151,30 @@ class ExtensionManager
      *
      * @return bool
      */
-    public function enableExtension(Extension $ext, $sapi = null)
+    public function enableExtension(Extension $extension, $sapi = null)
     {
-        $name = $ext->getExtensionName();
+        $name = $extension->getExtensionName();
         $this->logger->info("===> Enabling extension $name");
 
         if ($sapi) {
-            return $this->enableSapiExtension($ext, $name, $sapi, true);
+            return $this->enableSapiExtension($extension, $name, $sapi, true);
         }
 
         $first = true;
         $result = true;
         foreach (Config::getSapis() as $availableSapi) {
-            $result = $result && $this->enableSapiExtension($ext, $name, $availableSapi, $first);
+            $result = $result && $this->enableSapiExtension($extension, $name, $availableSapi, $first);
             $first = false;
         }
 
         return $result;
     }
 
-    private function enableSapiExtension(Extension $ext, $name, $sapi, $first = false)
+    private function enableSapiExtension(Extension $extension, $name, $sapi, $first = false)
     {
-        $default_file = $ext->getConfigFilePath();
-        $enabled_file = $ext->getConfigFilePath($sapi);
-        if (file_exists($enabled_file) && ($ext->isLoaded() && !$this->hasConflicts($ext))) {
+        $default_file = $extension->getConfigFilePath();
+        $enabled_file = $extension->getConfigFilePath($sapi);
+        if (file_exists($enabled_file) && ($extension->isLoaded() && !$this->hasConflicts($extension))) {
             $this->logger->info("[*] {$name} extension is already enabled for SAPI {$sapi}.");
 
             return true;
@@ -182,8 +183,8 @@ class ExtensionManager
         if (
             $first
             && !file_exists($default_file)
-            && !(file_exists($ext->getSharedLibraryPath())
-            && $this->createExtensionConfig($ext))
+            && !(file_exists($extension->getSharedLibraryPath())
+            && $this->createExtensionConfig($extension))
         ) {
             $this->logger->info("{$name} extension is not installed. Suggestions:");
             $this->logger->info("\t\$ phpswitch ext install {$name}");
@@ -191,11 +192,11 @@ class ExtensionManager
             return false;
         }
 
-        if (!file_exists(dirname($enabled_file))) {
+        if (!file_exists(dirname((string) $enabled_file))) {
             return true;
         }
 
-        $this->disableAntagonists($ext, $sapi);
+        $this->disableAntagonists($extension, $sapi);
 
         $disabled_file = $enabled_file . '.disabled';
         if (file_exists($disabled_file)) {
@@ -225,17 +226,17 @@ class ExtensionManager
      *
      * @return bool
      */
-    public function disableExtension(Extension $ext, $sapi = null)
+    public function disableExtension(Extension $extension, $sapi = null)
     {
-        $name = $ext->getExtensionName();
+        $name = $extension->getExtensionName();
 
         if (null !== $sapi) {
-            return $this->disableSapiExtension($ext->getConfigFilePath($sapi), $name, $sapi);
+            return $this->disableSapiExtension($extension->getConfigFilePath($sapi), $name, $sapi);
         }
 
         $result = true;
         foreach (Config::getSapis() as $availableSapi) {
-            $result = $result && $this->disableSapiExtension($ext->getConfigFilePath($availableSapi), $name, $sapi);
+            $result = $result && $this->disableSapiExtension($extension->getConfigFilePath($availableSapi), $name, $sapi);
         }
 
         return $result;
@@ -243,7 +244,7 @@ class ExtensionManager
 
     private function disableSapiExtension($extension_file, $name, $sapi)
     {
-        if (!file_exists(dirname($extension_file))) {
+        if (!file_exists(dirname((string) $extension_file))) {
             return true;
         }
 
@@ -268,21 +269,21 @@ class ExtensionManager
     /**
      * Disable extensions known to conflict with current one.
      */
-    public function disableAntagonists(Extension $ext, $sapi = null)
+    public function disableAntagonists(Extension $extension, $sapi = null)
     {
-        $name = $ext->getName();
+        $name = $extension->getName();
         if (isset($this->conflicts[$name])) {
             $conflicts = $this->conflicts[$name];
             $this->logger->info('===> Applying conflicts resolution (' . implode(', ', $conflicts) . '):');
-            foreach ($conflicts as $extensionName) {
-                $ext = ExtensionFactory::lookup($extensionName);
-                $this->disableExtension($ext, $sapi);
+            foreach ($conflicts as $conflict) {
+                $extension = ExtensionFactory::lookup($conflict);
+                $this->disableExtension($extension, $sapi);
             }
         }
     }
 
-    public function hasConflicts(Extension $ext)
+    public function hasConflicts(Extension $extension)
     {
-        return array_key_exists($ext->getName(), $this->conflicts);
+        return array_key_exists($extension->getName(), $this->conflicts);
     }
 }

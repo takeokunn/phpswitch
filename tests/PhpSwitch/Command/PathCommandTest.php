@@ -12,15 +12,7 @@ class PathCommandTest extends CommandTestCase
 {
     public function argumentsProvider()
     {
-        return array(
-            array("build",   "#\.phpswitch/build/.+#"),
-            array("ext-src", "#\.phpswitch/build/.+/ext$#"),
-            array("include", "#\.phpswitch/php/.+/include$#"),
-            array("etc",     "#\.phpswitch/php/.+/etc$#"),
-            array("dist",    "#\.phpswitch/distfiles$#"),
-            array("root",    "#\.phpswitch$#"),
-            array("home",    "#\.phpswitch$#"),
-        );
+        return [["build", "#\.phpswitch/build/.+#"], ["ext-src", "#\.phpswitch/build/.+/ext$#"], ["include", "#\.phpswitch/php/.+/include$#"], ["etc", "#\.phpswitch/php/.+/etc$#"], ["dist", "#\.phpswitch/distfiles$#"], ["root", "#\.phpswitch$#"], ["home", "#\.phpswitch$#"]];
     }
 
     /**

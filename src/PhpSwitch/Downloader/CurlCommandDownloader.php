@@ -10,7 +10,7 @@ class CurlCommandDownloader extends BaseDownloader
     {
         $this->logger->info('downloading via curl command');
         //todo proxy setting
-        $command = array('curl');
+        $command = ['curl'];
 
         if ($proxy = $this->options->{'http-proxy'}) {
             $this->logger->warn('http proxy is not support by this download.');
@@ -28,8 +28,8 @@ class CurlCommandDownloader extends BaseDownloader
             $command[] = '--silent';
         }
         $command[] = '-o';
-        $command[] = escapeshellarg($targetFilePath);
-        $command[] = escapeshellarg($url);
+        $command[] = escapeshellarg((string) $targetFilePath);
+        $command[] = escapeshellarg((string) $url);
         $cmd = implode(' ', $command);
         $this->logger->debug($cmd);
         Utils::system($cmd);

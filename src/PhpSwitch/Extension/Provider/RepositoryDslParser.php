@@ -4,29 +4,16 @@ namespace PhpSwitch\Extension\Provider;
 
 class RepositoryDslParser
 {
-    protected static $macros = array(
-        'https://bitbucket.org/' => array(
-            'git@bitbucket.org:',
-            'bitbucket:',
-        ),
-        'https://github.com/' => array(
-            'github:',
-            'git@github.com:',
-        ),
-    );
+    protected static $macros = ['https://bitbucket.org/' => ['git@bitbucket.org:', 'bitbucket:'], 'https://github.com/' => ['github:', 'git@github.com:']];
 
     public function parse($dsl)
     {
-        $ast = array(
-            'repository' => 'pecl',
-            'owner' => null,
-            'package' => $dsl,
-        );
+        $ast = ['repository' => 'pecl', 'owner' => null, 'package' => $dsl];
 
         $url = $this->toUrl($dsl);
 
         // parse provider, owner and repository
-        if (preg_match("#https?://(?:www\.)?([0-9a-zA-Z-_]*).+/([0-9a-zA-Z-._]*)/([0-9a-zA-Z-._]*)#", $url, $matches)) {
+        if (preg_match("#https?://(?:www\.)?([0-9a-zA-Z-_]*).+/([0-9a-zA-Z-._]*)/([0-9a-zA-Z-._]*)#", (string) $url, $matches)) {
             $ast['repository'] = $matches[1];
             $ast['owner'] = $matches[2];
             $ast['package'] = $matches[3];
@@ -39,9 +26,9 @@ class RepositoryDslParser
     {
         $url = $dsl;
         foreach (self::$macros as $target => $sources) {
-            $url = str_replace($sources, $target, $url);
+            $url = str_replace($sources, $target, (string) $url);
         }
 
-        return preg_replace('#\.git$#', '', $url);
+        return preg_replace('#\.git$#', '', (string) $url);
     }
 }

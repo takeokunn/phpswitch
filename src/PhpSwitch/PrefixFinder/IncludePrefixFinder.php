@@ -11,16 +11,10 @@ use PhpSwitch\Utils;
 final class IncludePrefixFinder implements PrefixFinder
 {
     /**
-     * @var string
-     */
-    private $path;
-
-    /**
      * @param string $path
      */
-    public function __construct($path)
+    public function __construct(private $path)
     {
-        $this->path = $path;
     }
 
     /**

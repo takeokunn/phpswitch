@@ -18,11 +18,11 @@ class ReleaseList
      * $releases['5.4'] = [ {},... ]
      * $releases['5.5'] = [ {},... ].
      */
-    public $releases = array();
+    public $releases = [];
 
-    public $versions = array();
+    public $versions = [];
 
-    public function __construct($releases = array())
+    public function __construct($releases = [])
     {
         $this->setReleases($releases);
     }
@@ -47,12 +47,12 @@ class ReleaseList
         if (!$json) {
             throw new RuntimeException("Can't load releases. Empty JSON given.");
         }
-        if ($releases = json_decode($json, true)) {
+        if ($releases = json_decode((string) $json, true, 512, JSON_THROW_ON_ERROR)) {
             $this->setReleases($releases);
 
             return $releases;
         } else {
-            throw new RuntimeException("Can't decode release json, invalid JSON string: " . substr($json, 0, 125));
+            throw new RuntimeException("Can't decode release json, invalid JSON string: " . substr((string) $json, 0, 125));
         }
     }
 
@@ -131,14 +131,14 @@ class ReleaseList
         }
     }
 
-    public function fetchRemoteReleaseList(OptionResult $options)
+    public function fetchRemoteReleaseList(OptionResult $optionResult)
     {
-        $releases = self::buildReleaseListFromOfficialSite($options);
+        $releases = self::buildReleaseListFromOfficialSite($optionResult);
         $this->setReleases($releases);
         $this->save();
     }
 
-    public static function getReadyInstance(OptionResult $options = null)
+    public static function getReadyInstance(OptionResult $optionResult = null)
     {
         static $instance;
 
@@ -151,42 +151,38 @@ class ReleaseList
         if ($instance->foundLocalReleaseList()) {
             $instance->setReleases($instance->loadLocalReleaseList());
         } else {
-            $instance->fetchRemoteReleaseList($options);
+            $instance->fetchRemoteReleaseList($optionResult);
         }
 
         return $instance;
     }
 
-    private static function downloadReleaseListFromOfficialSite($version, $max, OptionResult $options)
+    private static function downloadReleaseListFromOfficialSite($version, $max, OptionResult $optionResult)
     {
-        $url = 'https://www.php.net/releases/index.php?' . http_build_query(array(
-            'json'    => true,
-            'version' => $version,
-            'max'     => $max,
-        ));
+        $url = 'https://www.php.net/releases/index.php?' . http_build_query(['json'    => true, 'version' => $version, 'max'     => $max]);
 
-        $file = DownloadFactory::getInstance(Logger::getInstance(), $options)->download($url);
+        $file = DownloadFactory::getInstance(Logger::getInstance(), $optionResult)->download($url);
         $json = file_get_contents($file);
 
-        return json_decode($json, true);
+        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
     }
 
-    private static function buildReleaseListFromOfficialSite(OptionResult $options)
+    private static function buildReleaseListFromOfficialSite(OptionResult $optionResult)
     {
         $obj = array_merge(
-            self::downloadReleaseListFromOfficialSite(8, 100, $options),
-            self::downloadReleaseListFromOfficialSite(7, 100, $options)
+            self::downloadReleaseListFromOfficialSite(8, 100, $optionResult),
+            self::downloadReleaseListFromOfficialSite(7, 100, $optionResult)
         );
 
-        if ($options->get('old')) {
-            $obj = array_merge($obj, self::downloadReleaseListFromOfficialSite(5, 1000, $options));
+        if ($optionResult->get('old')) {
+            $obj = array_merge($obj, self::downloadReleaseListFromOfficialSite(5, 1000, $optionResult));
         }
 
-        $releaseVersions = array();
+        $releaseVersions = [];
         foreach ($obj as $k => $v) {
             if (preg_match('/^(\d+)\.(\d+)\./', $k, $matches)) {
-                list(, $major, $minor) = $matches;
-                $release = array('version' => $k);
+                [, $major, $minor] = $matches;
+                $release = ['version' => $k];
                 if (isset($v['announcement']['English'])) {
                     $release['announcement'] = 'https://php.net' . $v['announcement']['English'];
                 }
@@ -195,7 +191,7 @@ class ReleaseList
                     $release['date'] = $v['date'];
                 }
                 foreach ($v['source'] as $source) {
-                    if (isset($source['filename']) && preg_match('/\.tar\.bz2$/', $source['filename'])) {
+                    if (isset($source['filename']) && preg_match('/\.tar\.bz2$/', (string) $source['filename'])) {
                         $release['filename'] = $source['filename'];
                         $release['name'] = $source['name'];
                         if (isset($source['md5'])) {
@@ -215,9 +211,7 @@ class ReleaseList
         }
 
         foreach ($releaseVersions as $key => $_) {
-            uksort($releaseVersions[$key], function ($a, $b) {
-                return version_compare($b, $a);
-            });
+            uksort($releaseVersions[$key], fn($a, $b) => version_compare($b, $a));
         }
 
         return $releaseVersions;

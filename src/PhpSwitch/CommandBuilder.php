@@ -2,16 +2,13 @@
 
 namespace PhpSwitch;
 
-class CommandBuilder
+class CommandBuilder implements \Stringable
 {
     /* process nice value */
     public $nice;
 
-    /* script */
-    public $script;
-
     /* arguments */
-    public $args = array();
+    public $args = [];
 
     public $stdout;
 
@@ -21,9 +18,11 @@ class CommandBuilder
 
     public $logPath;
 
-    public function __construct($script)
+    public function __construct(
+        /* script */
+        public $script
+    )
     {
-        $this->script = $script;
     }
 
     public function args($args)
@@ -70,7 +69,7 @@ class CommandBuilder
         return $ret;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->buildCommand();
     }
@@ -92,7 +91,7 @@ class CommandBuilder
 
     public function buildCommand($handleRedirect = true)
     {
-        $cmd = array();
+        $cmd = [];
 
         if ($this->nice) {
             $cmd[] = 'nice';
@@ -103,7 +102,7 @@ class CommandBuilder
 
         if ($this->args) {
             foreach ($this->args as $arg) {
-                $cmd[] = escapeshellarg($arg);
+                $cmd[] = escapeshellarg((string) $arg);
             }
         }
 
@@ -122,7 +121,7 @@ class CommandBuilder
                 $cmd[] = '2>&1';
             } elseif ($this->logPath) {
                 $cmd[] = $this->append ? '>>' : '>';
-                $cmd[] = escapeshellarg($this->logPath);
+                $cmd[] = escapeshellarg((string) $this->logPath);
                 $cmd[] = '2>&1';
             }
         }

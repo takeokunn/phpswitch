@@ -12,25 +12,25 @@ class PhpCurlDownloader extends BaseDownloader
     {
         $this->logger->info("Downloading $url via curl extension");
 
-        $downloader = new CurlDownloader();
+        $curlDownloader = new CurlDownloader();
 
         $seconds = $this->options->{'connect-timeout'};
         if ($seconds || $seconds = getenv('CONNECT_TIMEOUT')) {
-            $downloader->setConnectionTimeout($seconds);
+            $curlDownloader->setConnectionTimeout($seconds);
         }
         if ($proxy = $this->options->{'http-proxy'}) {
-            $downloader->setProxy($proxy);
+            $curlDownloader->setProxy($proxy);
         }
         if ($proxyAuth = $this->options->{'http-proxy-auth'}) {
-            $downloader->setProxyAuth($proxyAuth);
+            $curlDownloader->setProxyAuth($proxyAuth);
         }
         if (!$this->options->{'no-progress'} && $this->logger->getLevel() > 2) {
-            $downloader->setProgressHandler(new ProgressBar());
+            $curlDownloader->setProgressHandler(new ProgressBar());
         }
         if ($this->options->{'continue'}) {
             $this->logger->warn('--continue is not support by this download.');
         }
-        $binary = $downloader->request($url);
+        $binary = $curlDownloader->request($url);
         if (false === file_put_contents($targetFilePath, $binary)) {
             throw new RuntimeException("Can't write file $targetFilePath");
         }

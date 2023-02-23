@@ -7,15 +7,12 @@ use RuntimeException;
 
 class SystemCommandException extends RuntimeException
 {
-    protected $logFile;
-
     protected $build;
 
-    public function __construct($message, Buildable $build = null, $logFile = null)
+    public function __construct($message, Buildable $buildable = null, protected $logFile = null)
     {
         parent::__construct($message);
-        $this->build = $build;
-        $this->logFile = $logFile;
+        $this->build = $buildable;
     }
 
     public function getLogFile()
