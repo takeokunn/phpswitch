@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
-class BuildFinder
+final class BuildFinder
 {
     /**
-     * @return string[] PHP builds
+     * @return list<string> PHP builds
      */
-    public static function findInstalledBuilds()
+    public static function findInstalledBuilds(): array
     {
         $path = Config::getRoot() . DIRECTORY_SEPARATOR . 'php';
 
@@ -31,9 +33,9 @@ class BuildFinder
     }
 
     /**
-     * @return string[] PHP versions
+     * @return list<string> PHP versions
      */
-    public static function findInstalledVersions()
+    public static function findInstalledVersions(): array
     {
         return array_map(fn($name) => preg_replace('/^php-(?=(\d+\.\d+\.\d+(-dev|((alpha|beta|RC)\d+))?)$)/', '', (string) $name), self::findInstalledBuilds());
     }
