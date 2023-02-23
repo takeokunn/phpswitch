@@ -73,8 +73,6 @@ final class VariantParser
      *     disabled_variants: list<string>,
      *     extra_options: list<string>
      * } $info
-     *
-     * @return string
      */
     public static function revealCommandArguments(array $info): string
     {

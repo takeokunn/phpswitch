@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 /**
@@ -9,8 +11,6 @@ interface PrefixFinder
 {
     /**
      * Returns the found prefix or NULL of it's not found.
-     *
-     * @return string|null
      */
-    public function findPrefix();
+    public function findPrefix(): ?string;
 }
