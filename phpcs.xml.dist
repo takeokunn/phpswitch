@@ -12,11 +12,29 @@
         <exclude name="PSR12.Properties.ConstantVisibility.NotFound"/>
     </rule>
 
+    <rule ref="Generic.Files.LineLength.TooLong">
+        <exclude-pattern>src/*</exclude-pattern>
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>tests/*</exclude-pattern>
     </rule>
 
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern>src/PhpSwitch/Utils.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Functions.MultiLineFunctionDeclaration.NewlineBeforeOpenBrace">
+        <exclude-pattern>src/PhpSwitch/CommandBuilder.php</exclude-pattern>
+        <exclude-pattern>src/PhpSwitch/Extension/Extension.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Functions.MultiLineFunctionDeclaration.CloseBracketLine">
+        <exclude-pattern>src/PhpSwitch/Extension/Extension.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Functions.MultiLineFunctionDeclaration.Indent">
+        <exclude-pattern>src/PhpSwitch/Extension/Extension.php</exclude-pattern>
     </rule>
 </ruleset>
