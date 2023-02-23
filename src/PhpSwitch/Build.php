@@ -44,7 +44,7 @@ final class Build implements Buildable
     /**
      * @var string the directory that contains bin/php, var/..., includes/
      */
-    private string $installPrefix;
+    public ?string $installPrefix = null;
     public BuildSettings $settings;
 
     /**
@@ -57,11 +57,11 @@ final class Build implements Buildable
      *
      * A build object contains the information of all build options, prefix, paths... etc
      *
-     * @param string $version       build version
-     * @param string $name          build name
-     * @param string $installPrefix install prefix
+     * @param string      $version       build version
+     * @param string|null $name          build name
+     * @param string|null $installPrefix install prefix
      */
-    public function __construct(string $version, string $name = null, string $installPrefix = null)
+    public function __construct(string $version, ?string $name = null, ?string $installPrefix = null)
     {
         if (str_starts_with($version, 'php-')) {
             $version = substr($version, 4);
@@ -143,7 +143,7 @@ final class Build implements Buildable
         return $etc;
     }
 
-    public function getInstallPrefix(): string
+    public function getInstallPrefix(): ?string
     {
         return $this->installPrefix;
     }
@@ -151,7 +151,7 @@ final class Build implements Buildable
     private function setBuildSettings(BuildSettings $buildSettings): void
     {
         $this->settings = $buildSettings;
-        if (!$this->getInstallPrefix()) {
+        if (is_null($this->installPrefix)) {
             return;
         }
 
@@ -169,14 +169,12 @@ final class Build implements Buildable
      * Find a installed build by name,
      * currently a $name is a php version, but in future we may have customized
      * name for users.
-     *
-     * @return Build
      */
     public static function findByName(string $name): ?Build
     {
         $prefix = Config::getVersionInstallPrefix($name);
         if (!file_exists($prefix)) {
-            return;
+            return null;
         }
 
         // a installation exists
