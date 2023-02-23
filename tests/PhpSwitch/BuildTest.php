@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests;
 
 use PhpSwitch\Build;
 use PHPUnit\Framework\TestCase;
 
-class BuildTest extends TestCase
+final class BuildTest extends TestCase
 {
     public function testBuildAPI()
     {
