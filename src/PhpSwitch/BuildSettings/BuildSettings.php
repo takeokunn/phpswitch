@@ -9,7 +9,7 @@ use Exception;
 final class BuildSettings
 {
     /**
-     * @var list<string>
+     * @var array<string, string|null>
      */
     private array $enabled_variants = [];
 
@@ -25,7 +25,7 @@ final class BuildSettings
 
     /**
      * @param array{
-     *     enabled_variants?: list<string>,
+     *     enabled_variants?: array<string, string|null>,
      *     disabled_variants?: list<string>,
      *     extra_options?: list<string>
      * }|array{} $settings
@@ -45,7 +45,7 @@ final class BuildSettings
 
     /**
      * @return array{
-     *     enabled_variants: list<string>,
+     *     enabled_variants: array<string, string|null>,
      *     disabled_variants: list<string>,
      *     extra_options: list<string>
      * }
@@ -66,7 +66,7 @@ final class BuildSettings
     // for enabled_variant
 
     /**
-     * @return list<string>
+     * @return array<string, string|null>
      */
     public function getEnabledVariants(): array
     {
@@ -74,23 +74,23 @@ final class BuildSettings
     }
 
     /**
-     * @param list<string> $settings
+     * @param array<string, string|null> $settings
      */
     public function setEnableVariants(array $settings): void
     {
-        foreach ($settings as $setting) {
-            $this->setEnableVariant($setting);
+        foreach ($settings as $key => $value) {
+            $this->setEnableVariant($key, $value);
         }
     }
 
-    public function setEnableVariant(string $name): void
+    public function setEnableVariant(string $key, ?string $value): void
     {
-        $this->enabled_variants = array_unique([...$this->enabled_variants, $name]);
+        $this->enabled_variants = [...$this->enabled_variants, $key => $value];
     }
 
     public function isEnabledVariant(string $name): bool
     {
-        return in_array($name, $this->enabled_variants, true);
+        return in_array($name, array_keys($this->enabled_variants), true);
     }
 
     // for disabled_variant
@@ -160,7 +160,7 @@ final class BuildSettings
 
     private function removeVariant(string $name): void
     {
-        $this->enabled_variants = array_filter($this->enabled_variants, fn ($value) => $value !== $name);
+        $this->enabled_variants = array_filter($this->enabled_variants, fn ($value) => $value !== $name, ARRAY_FILTER_USE_KEY);
     }
 
     public function loadVariantInfoFile(string $variantFile): void
@@ -176,7 +176,7 @@ final class BuildSettings
 
         /**
          * @var array{
-         *     enabled_variants?: list<string>,
+         *     enabled_variants?: array<string, string|null>,
          *     disabled_variants?: list<string>,
          *     extra_options?: list<string>,
          * } $variant_info
@@ -193,7 +193,7 @@ final class BuildSettings
 
     /**
      * @param array{
-     *     enabled_variants?: list<string>,
+     *     enabled_variants?: array<string, string|null>,
      *     disabled_variants?: list<string>,
      *     extra_options?: list<string>,
      * } $variant_info
