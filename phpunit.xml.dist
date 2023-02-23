@@ -17,6 +17,7 @@
     <testsuites>
         <testsuite name="PHPSwitch">
             <directory>tests/PhpSwitch/BuildSettings</directory>
+            <directory>tests/PhpSwitch/Distribution</directory>
         </testsuite>
     </testsuites>
     <filter>
