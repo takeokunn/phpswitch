@@ -12,7 +12,6 @@ use PhpSwitch\Testing\PatchTestCase;
  */
 class Apache2ModuleNamePatchTest extends PatchTestCase
 {
-
     public function versionProvider()
     {
         return array(
@@ -47,9 +46,9 @@ class Apache2ModuleNamePatchTest extends PatchTestCase
         $this->assertTrue($matched, 'patch matched');
         $patchedCount = $patch->apply($build, $logger);
 
-        $sourceExpectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . $version . '-apxs-patch';
+        $expectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . $version . '-apxs-patch';
         $this->assertEquals($expectedPatchedCount, $patchedCount);
-        $this->assertFileEquals($sourceExpectedDirectory . $makefile, $sourceDirectory . $makefile);
-        $this->assertFileEquals($sourceExpectedDirectory . '/configure', $sourceDirectory . '/configure');
+        $this->assertFileEquals($expectedDirectory . $makefile, $sourceDirectory . $makefile);
+        $this->assertFileEquals($expectedDirectory . '/configure', $sourceDirectory . '/configure');
     }
 }

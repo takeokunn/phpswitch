@@ -12,7 +12,6 @@ use PhpSwitch\Testing\CommandTestCase;
 
 class KnownCommandTest extends CommandTestCase
 {
-
     public $usesVCR = true;
 
     public function testPeclPackage()

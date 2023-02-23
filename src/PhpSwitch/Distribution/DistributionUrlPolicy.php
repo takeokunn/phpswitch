@@ -4,7 +4,6 @@ namespace PhpSwitch\Distribution;
 
 class DistributionUrlPolicy
 {
-
     /**
      * Returns the distribution url for the version.
      */

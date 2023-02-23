@@ -19,7 +19,6 @@ use PhpSwitch\Testing\CommandTestCase;
  */
 class ExtensionInstallerTest extends CommandTestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
