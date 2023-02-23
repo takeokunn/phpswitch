@@ -1,26 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Exception;
 
-use PhpSwitch\Buildable;
 use RuntimeException;
+use PhpSwitch\Buildable;
 
-class SystemCommandException extends RuntimeException
+final class SystemCommandException extends RuntimeException
 {
-    protected $build;
-
-    public function __construct($message, Buildable $buildable = null, protected $logFile = null)
-    {
+    public function __construct(
+        string $message,
+        protected Buildable $build
+    ) {
         parent::__construct($message);
-        $this->build = $buildable;
     }
 
-    public function getLogFile()
+    public function getLogFile(): string
     {
-        if ($this->logFile) {
-            return $this->logFile;
-        } elseif ($this->build) {
-            return $this->build->getBuildLogPath();
-        }
+        return $this->build->getBuildLogPath();
     }
 }

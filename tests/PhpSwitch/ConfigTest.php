@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests;
 
+use Exception;
 use PhpSwitch\Config;
 use PHPUnit\Framework\TestCase;
 
@@ -11,183 +14,145 @@ use PHPUnit\Framework\TestCase;
  * Phpswitch\Config class. When you want to set $PHPSWITCH_ROOT, $PHPSWITCH_HOME
  * or $HOME, you should get its value by calling `getenv' function and set
  * the value to the corresponding environment variable.
- * @small
  */
-class ConfigTest extends TestCase
+final class ConfigTest extends TestCase
 {
-    /**
-     * @expectedException \Exception
-     */
-    public function testGetPhpswitchHomeWhenHOMEIsNotDefined()
+    public function testGetPhpSwitchHomeWhenHOMEIsNotDefined(): void
     {
-        $env = ['PHPSWITCH_HOME' => null, 'PHPSWITCH_ROOT' => null, 'HOME'         => null];
+        $env = ['PHPSWITCH_HOME' => null, 'PHPSWITCH_ROOT' => null, 'HOME' => null];
+        $this->expectException(Exception::class);
+        $this->withEnv($env, fn () => Config::getHome());
+    }
+
+    public function testGetPhpSwitchHomeWhenHOMEIsDefined(): void
+    {
+        $env = ['HOME' => '.phpswitch', 'PHPSWITCH_HOME' => null];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/.phpswitch', Config::getHome()));
+    }
+
+    public function testGetPhpSwitchHomeWhenPhpswitchHomeIsDefined(): void
+    {
+        $env = ['HOME' => '.phpswitch', 'PHPSWITCH_HOME' => '.phpswitch'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch', Config::getHome()));
+    }
+
+    public function testGetPhpswitchRootWhenPhpswitchRootIsDefined(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch', Config::getRoot()));
+    }
+
+    public function testGetPhpswitchRootWhenHOMEIsDefined(): void
+    {
+        $env = ['HOME' => '.phpswitch', 'PHPSWITCH_ROOT' => null];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/.phpswitch', Config::getRoot()));
+    }
+
+    public function testGetBuildDir(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/build', Config::getBuildDir()));
+    }
+
+    public function testGetDistFileDir(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/distfiles', Config::getDistFileDir()));
+    }
+
+    public function testGetTempFileDir(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/tmp', Config::getTempFileDir()));
+    }
+
+    public function testGetCurrentPhpName(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.6.3'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('5.6.3', Config::getCurrentPhpName()));
+    }
+
+    public function testGetCurrentBuildDir(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.6.3'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/build/5.6.3', Config::getCurrentBuildDir()));
+    }
+
+    public function testGetPHPReleaseListPath(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php-releases.json', Config::getPHPReleaseListPath()));
+    }
+
+    public function testGetInstallPrefix(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php', Config::getInstallPrefix()));
+    }
+
+    public function testGetVersionInstallPrefix(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1', Config::getVersionInstallPrefix('5.5.1')));
+    }
+
+    public function testGetVersionEtcPath(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1/etc', Config::getVersionEtcPath('5.5.1')));
+    }
+
+    public function testGetVersionBinPath(): void
+    {
+        $env = [];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1/bin', Config::getVersionBinPath('5.5.1')));
+    }
+
+    public function testGetCurrentPhpConfigBin(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.5.1'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1/bin/php-config', Config::getCurrentPhpConfigBin()));
+    }
+
+    public function testGetCurrentPhpizeBin(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.5.1'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1/bin/phpize', Config::getCurrentPhpizeBin()));
+    }
+
+    public function testGetCurrentPhpConfigScanPath(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.5.1'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1/var/db', Config::getCurrentPhpConfigScanPath()));
+    }
+
+    public function testGetCurrentPhpDir(): void
+    {
+        $env = ['PHPSWITCH_PHP' => '5.5.1'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch/php/5.5.1', Config::getCurrentPhpDir()));
+    }
+
+    public function testGetLookupPrefix(): void
+    {
+        $env = ['PHPSWITCH_LOOKUP_PREFIX' => '.phpswitch'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch', Config::getLookupPrefix()));
+    }
+
+    public function testGetCurrentPhpBin(): void
+    {
+        $env = ['PHPSWITCH_PATH' => '.phpswitch'];
+        $this->withEnv($env, fn () => $this->assertStringEndsWith('.phpswitch', Config::getCurrentPhpBin()));
+    }
+
+    public function testGetConfigParam(): void
+    {
+        $env = ['PHPSWITCH_ROOT' => 'tests/fixtures'];
         $this->withEnv($env, function () {
-            Config::getHome();
-        });
-    }
-
-    public function testGetPhpswitchHomeWhenHOMEIsDefined()
-    {
-        $env = ['HOME'         => getenv('PHPSWITCH_ROOT'), 'PHPSWITCH_HOME' => null];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/.phpswitch', Config::getHome());
-        });
-    }
-
-    public function testGetPhpswitchHomeWhenPhpswitchHomeIsDefined()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch', Config::getHome());
-        });
-    }
-
-    public function testGetPhpswitchRootWhenPhpswitchRootIsDefined()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch', Config::getRoot());
-        });
-    }
-
-    public function testGetPhpswitchRootWhenHOMEIsDefined()
-    {
-        $env = ['HOME'         => getenv('PHPSWITCH_ROOT'), 'PHPSWITCH_ROOT' => null];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/.phpswitch', Config::getRoot());
-        });
-    }
-
-    public function testGetBuildDir()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/build', Config::getBuildDir());
-        });
-    }
-
-    public function testGetDistFileDir()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/distfiles', Config::getDistFileDir());
-        });
-    }
-
-    public function testGetTempFileDir()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/tmp', Config::getTempFileDir());
-        });
-    }
-
-    public function testGetCurrentPhpName()
-    {
-        $env = ['PHPSWITCH_PHP' => '5.6.3'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('5.6.3', Config::getCurrentPhpName());
-        });
-    }
-
-    public function testGetCurrentBuildDir()
-    {
-        $env = ['PHPSWITCH_PHP' => '5.6.3'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/build/5.6.3', Config::getCurrentBuildDir());
-        });
-    }
-
-    public function testGetPHPReleaseListPath()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php-releases.json', Config::getPHPReleaseListPath());
-        });
-    }
-
-    public function testGetInstallPrefix()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php', Config::getInstallPrefix());
-        });
-    }
-
-    public function testGetVersionInstallPrefix()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1', Config::getVersionInstallPrefix('5.5.1'));
-        });
-    }
-
-    public function testGetVersionEtcPath()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1/etc', Config::getVersionEtcPath('5.5.1'));
-        });
-    }
-
-    public function testGetVersionBinPath()
-    {
-        $this->withEnv([], function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1/bin', Config::getVersionBinPath('5.5.1'));
-        });
-    }
-
-    public function testGetCurrentPhpConfigBin()
-    {
-        $env = ['PHPSWITCH_PHP'  => '5.5.1'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1/bin/php-config', Config::getCurrentPhpConfigBin());
-        });
-    }
-
-    public function testGetCurrentPhpizeBin()
-    {
-        $env = ['PHPSWITCH_PHP'  => '5.5.1'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1/bin/phpize', Config::getCurrentPhpizeBin());
-        });
-    }
-
-    public function testGetCurrentPhpConfigScanPath()
-    {
-        $env = ['PHPSWITCH_PHP'  => '5.5.1'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1/var/db', Config::getCurrentPhpConfigScanPath());
-        });
-    }
-
-    public function testGetCurrentPhpDir()
-    {
-        $env = ['PHPSWITCH_PHP'  => '5.5.1'];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch/php/5.5.1', Config::getCurrentPhpDir());
-        });
-    }
-
-    public function testGetLookupPrefix()
-    {
-        $env = ['PHPSWITCH_LOOKUP_PREFIX' => getenv('PHPSWITCH_ROOT')];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch', Config::getLookupPrefix());
-        });
-    }
-
-    public function testGetCurrentPhpBin()
-    {
-        $env = ['PHPSWITCH_PATH' => getenv('PHPSWITCH_ROOT')];
-        $this->withEnv($env, function ($self) {
-            $self->assertStringEndsWith('.phpswitch', Config::getCurrentPhpBin());
-        });
-    }
-
-    public function testGetConfigParam()
-    {
-        $env = [
-            // I guess this causes the failure here: https://travis-ci.org/phpswitch/phpswitch/jobs/95057923
-            // 'PHPSWITCH_ROOT' => __DIR__ . '/../fixtures',
-            'PHPSWITCH_ROOT' => 'tests/fixtures',
-        ];
-        $this->withEnv($env, function ($self) {
             $config = Config::getConfig();
-            $self->assertSame(['key1' => 'value1', 'key2' => 'value2'], $config);
-            $self->assertEquals('value1', Config::getConfigParam('key1'));
-            $self->assertEquals('value2', Config::getConfigParam('key2'));
+            var_dump($config);
+            $this->assertSame(['key1' => 'value1', 'key2' => 'value2'], $config);
+            $this->assertEquals('value1', Config::getConfigParam('key1'));
+            $this->assertEquals('value2', Config::getConfigParam('key2'));
         });
     }
 
@@ -195,39 +160,36 @@ class ConfigTest extends TestCase
      * PHPSWITCH_HOME and PHPSWITCH_ROOT are automatically defined if
      * the function which invokes this method doesn't set them explicitly.
      * Set PHPSWITCH_HOME and PHPSWITCH_ROOT to null when you want to unset them.
+     *
+     * @param array<string, string|null> $new_env
      */
-    public function withEnv($newEnv, $callback)
+    private function withEnv(array $new_env, callable $callback): void
     {
-        // reset environment variables
-        $oldEnv = $this->resetEnv($newEnv + ['HOME'                  => null, 'PHPSWITCH_HOME'          => getenv('PHPSWITCH_HOME'), 'PHPSWITCH_PATH'          => null, 'PHPSWITCH_PHP'           => null, 'PHPSWITCH_ROOT'          => getenv('PHPSWITCH_ROOT'), 'PHPSWITCH_LOOKUP_PREFIX' => null]);
+        $initial_env = [
+            'HOME' => null,
+            'PHPSWITCH_HOME' => '.phpswitch',
+            'PHPSWITCH_PATH' => null,
+            'PHPSWITCH_PHP' => null,
+            'PHPSWITCH_ROOT' => '.phpswitch',
+            'PHPSWITCH_LOOKUP_PREFIX' => null,
+        ];
+        $this->resetEnv([...$initial_env, ...$new_env]);
 
         try {
-            $callback($this);
-            $this->resetEnv($oldEnv);
-        } catch (\Exception $e) {
-            $this->resetEnv($oldEnv);
+            $callback();
+            $this->resetEnv($initial_env);
+        } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function resetEnv($env)
+    /**
+     * @param array<string, string|null> $env
+     */
+    private function resetEnv(array $env): void
     {
-        $oldEnv = [];
         foreach ($env as $key => $value) {
-            $oldEnv[$key] = getenv($key);
-            $this->putEnv($key, $value);
+            putenv(is_null($value) ? $key : $key . '=' . $value);
         }
-        return $oldEnv;
-    }
-
-    public function putEnv($key, $value)
-    {
-        $setting = $key;
-
-        if ($value !== null) {
-            $setting .= '=' . $value;
-        }
-
-        $this->assertTrue(putenv($setting));
     }
 }

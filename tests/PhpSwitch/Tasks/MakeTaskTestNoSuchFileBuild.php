@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch\Tests\Tasks;
 
-class MakeTaskTestNoSuchFileBuild implements \PhpSwitch\Buildable
+use PhpSwitch\Buildable;
+
+final class MakeTaskTestNoSuchFileBuild implements Buildable
 {
-    public function getSourceDirectory()
+    public function getSourceDirectory(): string
     {
         return __DIR__ . '/../../fixtures/make/dummy';
     }
-    public function getBuildLogPath()
+
+    public function getBuildLogPath(): string
     {
-        return null;
+        return '';
     }
-    public function isBuildable()
+
+    public function isBuildable(): bool
     {
         return false;
     }

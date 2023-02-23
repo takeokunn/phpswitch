@@ -4,7 +4,6 @@ namespace PhpSwitch\Tests\Tasks;
 
 use CLIFramework\Logger;
 use GetOptionKit\OptionResult;
-use PhpSwitch\Buildable;
 use PhpSwitch\Tasks\MakeTask;
 use PHPUnit\Framework\TestCase;
 

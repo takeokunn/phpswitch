@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpSwitch;
 
 interface Buildable
@@ -7,15 +9,15 @@ interface Buildable
     /**
      * @return path return source directory
      */
-    public function getSourceDirectory();
+    public function getSourceDirectory(): string;
 
     /**
      * @return boolean
      */
-    public function isBuildable();
+    public function isBuildable(): bool;
 
     /**
      * @return string return build log file path.
      */
-    public function getBuildLogPath();
+    public function getBuildLogPath(): string;
 }
