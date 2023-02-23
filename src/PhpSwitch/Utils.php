@@ -12,10 +12,7 @@ use PhpSwitch\Exception\SystemCommandException;
 
 final class Utils
 {
-    /**
-     * @return string|false
-     */
-    public static function readTimeZone()
+    public static function readTimeZone(): string|false
     {
         $tz_file = '/etc/timezone';
         if (!is_readable($tz_file)) {
@@ -135,7 +132,7 @@ final class Utils
     /**
      * @param list<string>|string $command
      */
-    public static function system($command, Logger $logger = null, Buildable $build = null): int
+    public static function system(array|string $command, Logger $logger = null, Buildable $buildable = null): int
     {
         if (is_array($command)) {
             $command = implode(' ', $command);
@@ -147,7 +144,7 @@ final class Utils
 
         $lastline = system($command, $return_value);
         if ($return_value !== 0) {
-            throw new SystemCommandException("Command failed: $command returns: $lastline", $build);
+            throw new SystemCommandException("Command failed: $command returns: $lastline", $buildable);
         }
 
         return $return_value;

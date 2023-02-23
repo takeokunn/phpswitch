@@ -83,8 +83,8 @@ class ExtensionCommand extends BaseCommand
 
     public function execute()
     {
-        $buildDir = Config::getCurrentBuildDir();
-        $extDir = $buildDir . DIRECTORY_SEPARATOR . 'ext';
+        $currentBuildDir = Config::getCurrentBuildDir();
+        $extDir = $currentBuildDir . DIRECTORY_SEPARATOR . 'ext';
 
         // list for extensions which are not enabled
         $extensions = [];

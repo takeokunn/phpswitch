@@ -71,12 +71,12 @@ class InstallCommand extends BaseCommand
     {
         parent::prepare();
 
-        $buildDir = Config::getCurrentBuildDir();
-        $extDir = $buildDir . DIRECTORY_SEPARATOR . 'ext';
+        $currentBuildDir = Config::getCurrentBuildDir();
+        $extDir = $currentBuildDir . DIRECTORY_SEPARATOR . 'ext';
         if (!is_dir($extDir)) {
             $this->logger->error("Error: The ext directory '$extDir' does not exist.");
             $this->logger->error(
-                "It looks like you don't have the PHP source in $buildDir or you didn't extract the tarball."
+                "It looks like you don't have the PHP source in $currentBuildDir or you didn't extract the tarball."
             );
             $this->logger->error(
                 'Suggestion: Please install at least one PHP with your prefered version and switch to it.'

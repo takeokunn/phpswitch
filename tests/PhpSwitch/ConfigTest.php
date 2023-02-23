@@ -149,7 +149,6 @@ final class ConfigTest extends TestCase
         $env = ['PHPSWITCH_ROOT' => 'tests/fixtures'];
         $this->withEnv($env, function () {
             $config = Config::getConfig();
-            var_dump($config);
             $this->assertSame(['key1' => 'value1', 'key2' => 'value2'], $config);
             $this->assertEquals('value1', Config::getConfigParam('key1'));
             $this->assertEquals('value2', Config::getConfigParam('key2'));

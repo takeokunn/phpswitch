@@ -11,13 +11,13 @@ final class SystemCommandException extends RuntimeException
 {
     public function __construct(
         string $message,
-        protected Buildable $build
+        protected Buildable $buildable
     ) {
         parent::__construct($message);
     }
 
     public function getLogFile(): string
     {
-        return $this->build->getBuildLogPath();
+        return $this->buildable->getBuildLogPath();
     }
 }

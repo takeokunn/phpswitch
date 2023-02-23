@@ -16,13 +16,13 @@ use PHPUnit\Framework\TestCase;
  */
 class ExtensionManagerTest extends TestCase
 {
-    private \PhpSwitch\Extension\ExtensionManager $manager;
+    private \PhpSwitch\Extension\ExtensionManager $extensionManager;
 
     protected function setUp(): void
     {
         $logger = new Logger();
         $logger->setQuiet();
-        $this->manager = new ExtensionManager($logger);
+        $this->extensionManager = new ExtensionManager($logger);
 
         VCRAdapter::enableVCR($this);
     }
@@ -35,6 +35,6 @@ class ExtensionManagerTest extends TestCase
     public function testCleanExtension()
     {
         $ext = ExtensionFactory::lookup('xdebug', [getenv('PHPSWITCH_EXTENSION_DIR')]);
-        $this->assertTrue($this->manager->cleanExtension($ext));
+        $this->assertTrue($this->extensionManager->cleanExtension($ext));
     }
 }
