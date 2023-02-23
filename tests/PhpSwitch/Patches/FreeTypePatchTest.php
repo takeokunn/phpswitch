@@ -13,7 +13,7 @@ class FreeTypePatchTest extends PatchTestCase
         $logger = new Logger();
         $logger->setQuiet();
 
-        $sourceDirectory = getenv('PHPBREW_BUILD_PHP_DIR');
+        $sourceDirectory = getenv('PHPSWITCH_BUILD_PHP_DIR');
 
         $this->setupBuildDirectory('7.3.12');
 
@@ -25,7 +25,7 @@ class FreeTypePatchTest extends PatchTestCase
         $this->assertTrue($patch->match($build, $logger));
         $this->assertGreaterThan(0, $patch->apply($build, $logger));
 
-        $expectedDirectory = getenv('PHPBREW_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . '7.3.12-freetype-patch';
+        $expectedDirectory = getenv('PHPSWITCH_EXPECTED_PHP_DIR') . DIRECTORY_SEPARATOR . '7.3.12-freetype-patch';
         $this->assertFileEquals($expectedDirectory . '/ext/gd/config.m4', $sourceDirectory . '/ext/gd/config.m4');
     }
 }

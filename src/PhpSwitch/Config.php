@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * This config class provides settings based on the current environment
- * variables like PHPBREW_ROOT or PHPBREW_HOME.
+ * variables like PHPSWITCH_ROOT or PHPSWITCH_HOME.
  */
 class Config
 {
@@ -22,7 +22,7 @@ class Config
      */
     public static function getHome()
     {
-        if ($custom = getenv('PHPBREW_HOME')) {
+        if ($custom = getenv('PHPSWITCH_HOME')) {
             if (!file_exists($custom)) {
                 mkdir($custom, 0755, true);
             }
@@ -30,29 +30,29 @@ class Config
             return $custom;
         }
         if ($home = getenv('HOME')) {
-            $path = $home . DIRECTORY_SEPARATOR . '.phpbrew';
+            $path = $home . DIRECTORY_SEPARATOR . '.phpswitch';
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
             }
 
             return $path;
         }
-        throw new Exception('Environment variable PHPBREW_HOME or HOME is required');
+        throw new Exception('Environment variable PHPSWITCH_HOME or HOME is required');
     }
 
-    public static function setPhpbrewHome($home)
+    public static function setPhpswitchHome($home)
     {
-        putenv('PHPBREW_HOME=' . $home);
+        putenv('PHPSWITCH_HOME=' . $home);
     }
 
-    public static function setPhpbrewRoot($root)
+    public static function setPhpswitchRoot($root)
     {
-        putenv('PHPBREW_ROOT=' . $root);
+        putenv('PHPSWITCH_ROOT=' . $root);
     }
 
     public static function getRoot()
     {
-        if ($root = getenv('PHPBREW_ROOT')) {
+        if ($root = getenv('PHPSWITCH_ROOT')) {
             if (!file_exists($root)) {
                 mkdir($root, 0755, true);
             }
@@ -60,9 +60,9 @@ class Config
             return $root;
         }
         if ($home = getenv('HOME')) {
-            return $home . DIRECTORY_SEPARATOR . '.phpbrew';
+            return $home . DIRECTORY_SEPARATOR . '.phpswitch';
         }
-        throw new Exception('Environment variable PHPBREW_ROOT is required');
+        throw new Exception('Environment variable PHPSWITCH_ROOT is required');
     }
 
     /**
@@ -115,9 +115,9 @@ class Config
     /**
      * A build prefix is the prefix we specified when we install the PHP.
      *
-     * when PHPBREW_ROOT is pointing to /home/user/.phpbrew
+     * when PHPSWITCH_ROOT is pointing to /home/user/.phpswitch
      *
-     * php(s) will be installed into /home/user/.phpbrew/php/php-{version}
+     * php(s) will be installed into /home/user/.phpswitch/php/php-{version}
      *
      * @return string
      */
@@ -186,7 +186,7 @@ class Config
 
     /**
      * getCurrentPhpName return the current php version from
-     * self::$currentPhpVersion or from environment variable `PHPBREW_PHP`.
+     * self::$currentPhpVersion or from environment variable `PHPSWITCH_PHP`.
      *
      * @return string
      */
@@ -196,17 +196,17 @@ class Config
             return self::$currentPhpVersion;
         }
 
-        return getenv('PHPBREW_PHP');
+        return getenv('PHPSWITCH_PHP');
     }
 
     public static function getLookupPrefix()
     {
-        return getenv('PHPBREW_LOOKUP_PREFIX');
+        return getenv('PHPSWITCH_LOOKUP_PREFIX');
     }
 
     public static function getCurrentPhpBin()
     {
-        return getenv('PHPBREW_PATH');
+        return getenv('PHPSWITCH_PATH');
     }
 
     public static function getConfig()

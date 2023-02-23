@@ -106,7 +106,7 @@ class Utils
             '/opt/local',
         );
 
-        if ($pathStr = getenv('PHPBREW_LOOKUP_PREFIX')) {
+        if ($pathStr = getenv('PHPSWITCH_LOOKUP_PREFIX')) {
             $paths = explode(':', $pathStr);
             foreach ($paths as $path) {
                 $prefixes[] = $path;

@@ -146,7 +146,7 @@ __mycompappend ()
 }
 __complete_meta ()
 {
-    local app="phpbrew"
+    local app="phpswitch"
     local command_signature=$1
     local complete_for=$2
     local arg=$3  # could be "--dir", 0 for argument index
@@ -162,9 +162,9 @@ __complete_meta ()
     COMPREPLY=($(compgen -W "${lines[*]:1}" -- $cur))
 }
 
-___phpbrew_complete_help ()
+___phpswitch_complete_help ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -290,9 +290,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_zsh ()
+___phpswitch_complete_zsh ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -418,9 +418,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_bash ()
+___phpswitch_complete_bash ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -546,9 +546,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_meta ()
+___phpswitch_complete_meta ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -686,9 +686,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_compile ()
+___phpswitch_complete_compile ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -814,9 +814,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_archive ()
+___phpswitch_complete_archive ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -948,9 +948,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_github:build-topics ()
+___phpswitch_complete_github:build-topics ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1084,9 +1084,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_init ()
+___phpswitch_complete_init ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1212,9 +1212,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_known ()
+___phpswitch_complete_known ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1340,9 +1340,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_install ()
+___phpswitch_complete_install ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1480,9 +1480,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_list ()
+___phpswitch_complete_list ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1608,9 +1608,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_use ()
+___phpswitch_complete_use ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1744,9 +1744,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_switch ()
+___phpswitch_complete_switch ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -1880,9 +1880,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_each ()
+___phpswitch_complete_each ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2008,9 +2008,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_config ()
+___phpswitch_complete_config ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2136,9 +2136,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_info ()
+___phpswitch_complete_info ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2264,9 +2264,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_env ()
+___phpswitch_complete_env ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2400,9 +2400,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.enable ()
+___phpswitch_complete_extension.enable ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2536,9 +2536,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.install ()
+___phpswitch_complete_extension.install ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2672,9 +2672,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.disable ()
+___phpswitch_complete_extension.disable ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2808,9 +2808,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.config ()
+___phpswitch_complete_extension.config ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -2944,9 +2944,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.clean ()
+___phpswitch_complete_extension.clean ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3080,9 +3080,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.show ()
+___phpswitch_complete_extension.show ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3216,9 +3216,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension.known ()
+___phpswitch_complete_extension.known ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3352,9 +3352,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_extension ()
+___phpswitch_complete_extension ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3480,9 +3480,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_extension ()
+___phpswitch_complete_extension ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3608,9 +3608,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_variants ()
+___phpswitch_complete_variants ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3742,9 +3742,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_path ()
+___phpswitch_complete_path ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -3889,9 +3889,9 @@ dist" -- $cur) )
         fi
     fi
 };
-___phpbrew_complete_cd ()
+___phpswitch_complete_cd ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4028,9 +4028,9 @@ dist" -- $cur) )
         fi
     fi
 };
-___phpbrew_complete_download ()
+___phpswitch_complete_download ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4164,9 +4164,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_clean ()
+___phpswitch_complete_clean ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4300,9 +4300,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_update ()
+___phpswitch_complete_update ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4428,9 +4428,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_ctags ()
+___phpswitch_complete_ctags ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4564,9 +4564,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_fpm.restart ()
+___phpswitch_complete_fpm.restart ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4692,9 +4692,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_fpm.setup ()
+___phpswitch_complete_fpm.setup ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4826,9 +4826,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_fpm.start ()
+___phpswitch_complete_fpm.start ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -4954,9 +4954,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_fpm.stop ()
+___phpswitch_complete_fpm.stop ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5082,9 +5082,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_fpm ()
+___phpswitch_complete_fpm ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5210,9 +5210,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_fpm ()
+___phpswitch_complete_fpm ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5338,9 +5338,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_list-ini ()
+___phpswitch_complete_list-ini ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5466,9 +5466,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_self-update ()
+___phpswitch_complete_self-update ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5594,9 +5594,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_remove ()
+___phpswitch_complete_remove ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5730,9 +5730,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_purge ()
+___phpswitch_complete_purge ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5866,9 +5866,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_off ()
+___phpswitch_complete_off ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -5994,9 +5994,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_switch-off ()
+___phpswitch_complete_switch-off ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -6122,9 +6122,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_system ()
+___phpswitch_complete_system ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -6258,9 +6258,9 @@ if [[ $argument_min_length > 0 ]] ; then
         fi
     fi
 };
-___phpbrew_complete_system-off ()
+___phpswitch_complete_system-off ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -6386,9 +6386,9 @@ local argument_min_length=0
         fi
     fi
 };
-___phpbrew_complete_phpbrew ()
+___phpswitch_complete_phpswitch ()
 {
-local comp_prefix=___phpbrew
+local comp_prefix=___phpswitch
 
         local cur words cword prev
         _get_comp_words_by_ref -n =: cur words cword prev
@@ -6412,7 +6412,7 @@ local comp_prefix=___phpbrew
         # options_require_value: defines the required completion type for each
         # option that requires a value.
         declare -A options_require_value
-        subcommands=(["help"]="Show help message of a command" ["zsh"]="This function generate a zsh-completion script automatically" ["bash"]="This command generate a bash completion script automatically" ["meta"]="Return the meta data of a commands." ["compile"]="compile current source into Phar format library file." ["archive"]="Build executable phar file from composer.json" ["github:build-topics"]="Build topic classes from the wiki of a GitHub Project." ["init"]="Initialize phpbrew config file." ["known"]="List known PHP versions" ["install"]="Install php" ["list"]="List installed PHPs" ["use"]="Use php, switch version temporarily" ["switch"]="Switch default php version." ["each"]="Iterate and run a given shell command over all php versions managed by PHPBrew." ["config"]="Edit your current php.ini in your favorite $EDITOR" ["info"]="Show current PHP information" ["env"]="Export environment variables" ["extension"]="List extensions or execute extension subcommands" ["variants"]="List php variants" ["path"]="Show paths of the current PHP." ["cd"]="Change to directories" ["download"]="Download php" ["clean"]="Clean up the source directory of a PHP distribution" ["update"]="Update PHP release source file" ["ctags"]="Run ctags at current php source dir for extension development." ["fpm"]="fpm commands" ["list-ini"]="List loaded ini config files." ["self-update"]="Self-update, default to master version" ["remove"]="Remove installed php build." ["purge"]="Remove installed php version and config files." ["off"]="Temporarily go back to the system php" ["switch-off"]="Definitely go back to the system php" ["system"]="Get or set the internally used PHP binary" ["system-off"]="Use the currently effective PHP binary internally" )
+        subcommands=(["help"]="Show help message of a command" ["zsh"]="This function generate a zsh-completion script automatically" ["bash"]="This command generate a bash completion script automatically" ["meta"]="Return the meta data of a commands." ["compile"]="compile current source into Phar format library file." ["archive"]="Build executable phar file from composer.json" ["github:build-topics"]="Build topic classes from the wiki of a GitHub Project." ["init"]="Initialize phpswitch config file." ["known"]="List known PHP versions" ["install"]="Install php" ["list"]="List installed PHPs" ["use"]="Use php, switch version temporarily" ["switch"]="Switch default php version." ["each"]="Iterate and run a given shell command over all php versions managed by Phpswitch." ["config"]="Edit your current php.ini in your favorite $EDITOR" ["info"]="Show current PHP information" ["env"]="Export environment variables" ["extension"]="List extensions or execute extension subcommands" ["variants"]="List php variants" ["path"]="Show paths of the current PHP." ["cd"]="Change to directories" ["download"]="Download php" ["clean"]="Clean up the source directory of a PHP distribution" ["update"]="Update PHP release source file" ["ctags"]="Run ctags at current php source dir for extension development." ["fpm"]="fpm commands" ["list-ini"]="List loaded ini config files." ["self-update"]="Self-update, default to master version" ["remove"]="Remove installed php build." ["purge"]="Remove installed php version and config files." ["off"]="Temporarily go back to the system php" ["switch-off"]="Definitely go back to the system php" ["system"]="Get or set the internally used PHP binary" ["system-off"]="Use the currently effective PHP binary internally" )
 subcommand_alias=(["a"]="archive" ["ar"]="archive" ["i"]="install" ["ins"]="install" ["ext"]="extension" )
 subcommand_signs=(["help"]="help" ["zsh"]="zsh" ["bash"]="bash" ["meta"]="meta" ["compile"]="compile" ["archive"]="archive" ["github:build-topics"]="github:build-topics" ["init"]="init" ["known"]="known" ["install"]="install" ["list"]="list" ["use"]="use" ["switch"]="switch" ["each"]="each" ["config"]="config" ["info"]="info" ["env"]="env" ["extension"]="extension" ["variants"]="variants" ["path"]="path" ["cd"]="cd" ["download"]="download" ["clean"]="clean" ["update"]="update" ["ctags"]="ctags" ["fpm"]="fpm" ["list-ini"]="list-ini" ["self-update"]="self-update" ["remove"]="remove" ["purge"]="purge" ["off"]="off" ["switch-off"]="switch-off" ["system"]="system" ["system-off"]="system-off" )
 options=(["-v"]="1" ["--verbose"]="1" ["-d"]="1" ["--debug"]="1" ["-q"]="1" ["--quiet"]="1" ["-h"]="1" ["--help"]="1" ["--version"]="1" ["-p"]="1" ["--profile"]="1" ["--log-path"]="1" ["--no-interact"]="1" ["--no-progress"]="1" )
@@ -6515,8 +6515,8 @@ local argument_min_length=0
     fi
 };
 
-___phpbrew_main_wrapper()
+___phpswitch_main_wrapper()
 {
-    ___phpbrew_complete_phpbrew "app" 0
+    ___phpswitch_complete_phpswitch "app" 0
 }
-complete -o bashdefault -o default -o nospace -F ___phpbrew_main_wrapper phpbrew 2>/dev/null
+complete -o bashdefault -o default -o nospace -F ___phpswitch_main_wrapper phpswitch 2>/dev/null
