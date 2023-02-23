@@ -1,16 +1,12 @@
-name: build
+name: phpcs
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   run:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [ubuntu-latest]
-        php-versions: ['8.0', '8.1', '8.2']
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,4 +22,4 @@ jobs:
         uses: ramsey/composer-install@v2
 
       - name: Run test suite
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+        run: vendor/bin/phpcs src/ tests/

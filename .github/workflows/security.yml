@@ -2,7 +2,7 @@ name: Security
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
   release:
     types: [created]
