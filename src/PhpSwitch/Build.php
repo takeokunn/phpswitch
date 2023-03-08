@@ -51,7 +51,7 @@ final class Build implements Buildable
      * @param string|null $name          build name
      * @param string|null $installPrefix install prefix
      */
-    public function __construct(string $version, ?string $name = null, ?string $installPrefix = null)
+    public function __construct(string $version, ?string $name = null, ?int $installPrefix = null)
     {
         if (str_starts_with($version, 'php-')) {
             $version = substr($version, 4);
