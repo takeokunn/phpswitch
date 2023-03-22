@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dea40538b8b6f882d452d7d527808de",
+    "content-hash": "0a272d76ee654862691642f3ad9604b4",
     "packages": [
         {
             "name": "corneltek/cliframework",
@@ -350,16 +350,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.1",
+            "version": "1.10.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "1cd5fc530a8b68702f3733ad64294b2a39564198"
+                "reference": "b10ceb526d9607903c5b2673f1fc8775dbe48975"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1cd5fc530a8b68702f3733ad64294b2a39564198",
-                "reference": "1cd5fc530a8b68702f3733ad64294b2a39564198",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b10ceb526d9607903c5b2673f1fc8775dbe48975",
+                "reference": "b10ceb526d9607903c5b2673f1fc8775dbe48975",
                 "shasum": ""
             },
             "require": {
@@ -388,8 +388,11 @@
                 "static analysis"
             ],
             "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.10.1"
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
             },
             "funding": [
                 {
@@ -405,7 +408,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-21T21:57:23+00:00"
+            "time": "2023-03-16T15:24:20+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -515,16 +518,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.15.18",
+            "version": "0.15.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "2c4708affb035af01f6b4a3b4a82f75cc306b039"
+                "reference": "5c499ec662a698d5042a3cdc936a4642ada35e19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/2c4708affb035af01f6b4a3b4a82f75cc306b039",
-                "reference": "2c4708affb035af01f6b4a3b4a82f75cc306b039",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/5c499ec662a698d5042a3cdc936a4642ada35e19",
+                "reference": "5c499ec662a698d5042a3cdc936a4642ada35e19",
                 "shasum": ""
             },
             "require": {
@@ -556,9 +559,15 @@
                 "MIT"
             ],
             "description": "Instant Upgrade and Automated Refactoring of any PHP code",
+            "keywords": [
+                "automation",
+                "dev",
+                "migration",
+                "refactoring"
+            ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.15.18"
+                "source": "https://github.com/rectorphp/rector/tree/0.15.22"
             },
             "funding": [
                 {
@@ -566,7 +575,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-22T12:06:55+00:00"
+            "time": "2023-03-22T09:37:21+00:00"
         },
         {
             "name": "symfony/class-loader",
